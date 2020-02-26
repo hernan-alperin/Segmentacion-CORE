@@ -45,6 +45,7 @@ class DAO:
 
 #data = DAO()
 #data = DAO('a')
-data = DAO('u:p:d:h')
+#data = DAO('u:p:d')
+data = DAO('segmentador:rodatnemges:censo2020:172.26.67.239')
 
 
