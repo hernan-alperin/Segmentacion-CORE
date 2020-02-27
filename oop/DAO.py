@@ -14,14 +14,13 @@ import sys
 
 class DAO:
     # Data Abract Object
+    def __init__(self):
+        pass
 
-    def __init__(self, db_string):
+    def db(self, db_string):
         conn_info = db_string.split(':')
-        try:
-            len(conn_info) != 3
-        except psycopg2.Error as e:
-            print ('connection string: "', db_string, '" must be user:pass:db(:server(:port))')
-            sys.exit()
+        if len(conn_info) < 3:
+            raise Exception('connection string: "' + db_string + '" must be user:pass:db(:server(:port))')
 
         self.user = conn_info[0]
         self.passwd = conn_info[1]
@@ -39,13 +38,18 @@ class DAO:
         except psycopg2.Error as e:
             print ('cannot connect', db_string)
             print (e)
+        return conn
 
     def __str__(self):
         pass
 
-#data = DAO()
-#data = DAO('a')
-#data = DAO('u:p:d')
-data = DAO('segmentador:rodatnemges:censo2020:172.26.67.239')
+dao = DAO()
+#conn = dao.db()
+#conn = dao.db('a')
+#conn = dao.db('u:p:d')
+conn = dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
+print (conn)
+cur = conn.cursor()
+print (cur)
 
 
