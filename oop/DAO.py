@@ -53,13 +53,32 @@ class DAO:
         try:
             cur.execute(sql)
             self.radios = cur.fetchall()
-            return self.radios
         except psycopg2.Error as e:
             print ('q cagada :-(', region)
             print (e)
-        
+        return self.radios
 
+    def listado(self, region):
+        sql = 'select * from "' + region + '".listado'
+        try:
+            cur.execute(sql)
+            self.listado = cur.fetchall()
+            return listado
+        except psycopg2.Error as e:
+            print ('q cagada :-(', region)
+            print (e)
 
+    def adyacencias(self, region):
+        sql = 'select * from "' + region + '".lados_adyacentes'
+        try:
+            cur.execute(sql)
+            adyacencias = cur.fetchall()
+            return adyacencias
+        except psycopg2.Error as e:
+            print ('q cagada :-(', region)
+            print (e)
+
+ 
 
 dao = DAO()
 #conn = dao.db()
@@ -74,4 +93,11 @@ print (cur)
 #radios = dao.radios('1')
 radios = dao.radios('e0298')
 print (radios)
+
+#listado = dao.listado('e0298')
+#print (listado)
+
+adyacencias = dao.adyacencias('0365')
+print (adyacencias)
+
 
