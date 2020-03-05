@@ -55,7 +55,7 @@ class DAO:
             self.cur.execute(sql)
             self.radios = self.cur.fetchall()
         except psycopg2.Error as e:
-            print ('q cagada :-(', region)
+            print ('no puede ejecutar ' + sql, region)
             print (e)
         return self.radios
 
@@ -66,30 +66,138 @@ class DAO:
             listado = self.cur.fetchall()
             return listado
         except psycopg2.Error as e:
-            print ('q cagada :-(', region)
+            print ('no puede cargar listado: ' + sql, region)
             print (e)
 
+    def sql_where_pdfr(self, prov, dpto, frac, radio):
+        return ("\nwhere prov::integer = " + str(prov)
+            + "\n and dpto::integer = " + str(dpto)
+            + "\n and frac::integer = " + str(frac)
+            + "\n and radio::integer = " + str(radio))
+
+    def get_conteos_mzas(self, region, prov, dpto, frac, radio):
+        sql = ('select mza, sum(conteo)::int from "' + region + '".conteos'
+            + self.sql_where_pdfr(prov, dpto, frac, radio)
+            + '\ngroup by mza;')
+        try:
+            self.cur.execute(sql)
+            conteos = self.cur.fetchall()
+            return conteos
+        except psycopg2.Error as e:
+            print ('no puede cargar conteos: ' + sql, region)
+            print (e)
+
+    def get_conteos_lados(self, region, prov, dpto, frac, radio):
+        sql = ('select mza, lado, sum(conteo)::int from "' + region + '".conteos'
+            + self.sql_where_pdfr(prov, dpto, frac, radio)
+            + '\ngroup by mza, lado;')
+        try:
+            self.cur.execute(sql)
+            conteos = self.cur.fetchall()
+            return conteos
+        except psycopg2.Error as e:
+            print ('no puede cargar conteos: ' + sql, region)
+            print (e)
+
+    def get_ultimo_lado_mzas(self, region, prov, dpto, frac, radio):
+        sql = ('select mza, max(lado) from "' + region + '".conteos'
+            + self.sql_where_pdfr(prov, dpto, frac, radio)
+            + '\ngroup by mza, lado;')
+        try:
+            self.cur.execute(sql)
+            conteos = self.cur.fetchall()
+            return conteos
+        except psycopg2.Error as e:
+            print ('no puede cargar ulimo lado: ' + sql, region)
+            print (e)
+
+
+
     def get_adyacencias(self, region):
-        sql = 'select * from "' + region + '".lados_adyacentes'
+        sql = 'select * from "' + region + '".lados_adyacentes\n'
         try:
             self.cur.execute(sql)
             adyacencias = self.cur.fetchall()
             return adyacencias
         except psycopg2.Error as e:
-            print ('q cagada :-(', region)
+            print ('no puede cargar adyacentes: \n' + sql, region)
             print (e)
 
-    def sql_where_PPDDDLLLMMM(prov, depto, frac, radio, cpte, side):
+    def get_adyacencias_mzas_mzas(self, region, prov, dpto, frac, radio):
+        sql = ('select substr(mza_i,13,3), substr(mza_j,13,3) from "' + region + '".lados_adyacentes'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and mza_i != mza_j"
+            + "\ngroup by mza_i, mza_j;\n")
+        try:
+            self.cur.execute(sql)
+            adyacencias = self.cur.fetchall()
+            return adyacencias
+        except psycopg2.Error as e:
+            print ('no puede cargar adyacentes: \n' + sql, region)
+            print (e)
+
+    def get_adyacencias_mzas_lados(self, region, prov, dpto, frac, radio):
+        sql = ('select substr(mza_i,13,3), substr(mza_j,13,3), lado_j from "' + region + '".lados_adyacentes'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and mza_i != mza_j"
+            + "\ngroup by mza_i, mza_j, lado_j;\n")
+        try:
+            self.cur.execute(sql)
+            adyacencias = self.cur.fetchall()
+            return adyacencias
+        except psycopg2.Error as e:
+            print ('no puede cargar adyacentes: \n' + sql, region)
+            print (e)
+
+    def get_adyacencias_lados_mzas(self, region, prov, dpto, frac, radio):
+        sql = ('select substr(mza_i,13,3), lado_i, substr(mza_j,13,3) from "' + region + '".lados_adyacentes'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and mza_i != mza_j"
+            + "\ngroup by mza_i, lado_i, mza_j;\n")
+        try:
+            self.cur.execute(sql)
+            adyacencias = self.cur.fetchall()
+            return adyacencias
+        except psycopg2.Error as e:
+            print ('no puede cargar adyacentes: \n' + sql, region)
+            print (e)
+
+    def get_adyacencias_lados_lados(self, region, prov, dpto, frac, radio):
+        sql = ('select substr(mza_i,13,3), lado_i, substr(mza_j,13,3), lado_j from "' + region + '".lados_adyacentes'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and mza_i != mza_j"
+            + "\ngroup by mza_i, lado_i, mza_j, lado_j;\n")
+        try:
+            self.cur.execute(sql)
+            adyacencias = self.cur.fetchall()
+            return adyacencias
+        except psycopg2.Error as e:
+            print ('no puede cargar adyacentes: \n' + sql, region)
+            print (e)
+
+        
+
+    def sql_where_PPDDDLLLFFRR(self, prov, depto, frac, radio):
+        where_mza = ("\nwhere substr(mza_i,1,2)::integer = " + str(prov)
+                + "\n and substr(mza_i,3,3)::integer = " + str(depto)
+                + "\n and substr(mza_i,9,2)::integer = " + str(frac)
+                + "\n and substr(mza_i,11,2)::integer = " + str(radio)
+                )
+        return where_mza
+
+
+
+    def sql_where_PPDDDLLLMMM(self, prov, dpto, frac, radio, cpte, side):
         if type(cpte) is int:
             mza = cpte
         elif type(cpte) is tuple:
             (mza, lado) = cpte
-            where_mza = ("\nwhere substr(mza" + side + ",1,2)::integer = " + str(prov)
-                + "\n and substr(mza" + side + ",3,3)::integer = " + str(depto)
-                + "\n and substr(mza" + side + ",9,2)::integer = " + str(frac)
-                + "\n and substr(mza" + side + ",11,2)::integer = " + str(radio)
-                + "\n and substr(mza" + side + ",13,3)::integer = " + str(mza)
-                )
+        where_mza = ("\nwhere substr(mza" + side + ",1,2)::integer = " + str(prov)
+            + "\n and substr(mza" + side + ",3,3)::integer = " + str(dpto)
+            + "\n and substr(mza" + side + ",9,2)::integer = " + str(frac)
+            + "\n and substr(mza" + side + ",11,2)::integer = " + str(radio)
+            + "\n and substr(mza" + side + ",13,3)::integer = " + str(mza)
+            )
         if type(cpte) is tuple:
             where_mza = (where_mza 
             + "\n and lado" + side + "::integer = " + str(lado))
@@ -101,14 +209,14 @@ class DAO:
     #------
          sql_i = ("update " + region + '.arc'
             + " set segi = " + str(seg)
-            + sql_where_PPDDDLLLMMM(prov, depto, frac, radio, cpte, 'i')
+            + self.sql_where_PPDDDLLLMMM(prov, dpto, frac, radio, cpte, 'i')
             + " AND mzai is not null AND mzai != ''"
             + "\n;")
          #print "", sql_i
          self.cur.execute(sql_i)
          sql_d = ("update " + region + '.arc'   
             + " set segd = " + str(seg)
-            + sql_where_PPDDDLLLMMM(prov, depto, frac, radio, cpte, 'd')
+            + self.sql_where_PPDDDLLLMMM(prov, dpto, frac, radio, cpte, 'd')
             + " AND mzad is not null AND mzad != ''"
             + "\n;")
          #print " ", sql_d
@@ -116,7 +224,7 @@ class DAO:
          self.conn.commit()
         
  
-
+"""
 dao = DAO()
 #conn = dao.db()
 #conn = dao.db('a')
@@ -127,14 +235,14 @@ print (dao.cur)
 
 #radios = dao.radios(1)
 #radios = dao.radios('1')
-radios = dao.radios('e0298')
+radios = dao.radios('e0359')
 print (radios)
 
 #listado = dao.get_listado('e0298')
 #print (listado)
 
-adyacencias = dao.get_adyacencias('0365')
-print (adyacencias)
+#adyacencias = dao.get_adyacencias('0365')
+#print (adyacencias)
 
-
+"""
 

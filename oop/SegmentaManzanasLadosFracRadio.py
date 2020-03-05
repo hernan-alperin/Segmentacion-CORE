@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+sys.path.append('.')
 from decimal import *
 print (sys.argv[1:])
 _table = sys.argv[1]
@@ -94,7 +95,7 @@ def cuantas_manzanas(estos):
 cantidad_de_viviendas_deseada_por_segmento = 20
 cantidad_de_viviendas_maxima_deseada_por_segmento = 23
 cantidad_de_viviendas_minima_deseada_por_segmento = 17
-cantidad_de_viviendas_permitida_para_romper_manazna = 5
+cantidad_de_viviendas_permitida_para_romper_manzana = 5
 multa_fuera_rango_superior = 1
 multa_fuera_rango_inferior = 1
 
@@ -226,10 +227,13 @@ import psycopg2
 import operator
 import time
 
+from DAO import DAO
+
 #_table = '0339'  # San Javier
 #_prov = 54
 #_dpto = 105 # ahora vienen en arg
 
+"""
 conexion = ["censo2020", "segmentador", "rodatnemges", "172.26.67.239", "5432"]
 conn = psycopg2.connect(
             database = conexion[0],
@@ -244,9 +248,15 @@ sql = ("select distinct prov::integer, dpto::integer, frac::integer, radio::inte
        " from segmentacion.conteos"
        " order by prov::integer, dpto::integer, frac::integer, radio::integer;")
 cur.execute(sql)
+"""
+dao = DAO()
+dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
+radios = dao.radios('e0359')
+"""
 radios = cur.fetchall()
 print (_prov, _dpto)
 print (radios)
+"""
 
 def sql_where_pdfr(prov, dpto, frac, radio):
     return ("\nwhere prov::integer = " + str(prov)
@@ -275,6 +285,7 @@ for prov, dpto, frac, radio in radios:
     if (radio and prov == _prov and dpto == _dpto and frac == _frac and radio == _radio): # las del _table
         print
         print ("radio: ")
+        """
         print (prov, dpto, frac, radio)
         cur = conn.cursor()
         sql = ("select mza, sum(conteo)::int from segmentacion.conteos"
@@ -282,33 +293,43 @@ for prov, dpto, frac, radio in radios:
             + "\ngroup by mza;")
         cur.execute(sql)
         conteos_mzas = cur.fetchall()
+        """
+        conteos_mzas = dao.get_conteos_mzas(_table, prov, dpto, frac, radio)
         manzanas = [mza for mza, conteo in conteos_mzas]
 
 #        print >> sys.stderr, "conteos_mzas"
 #        print >> sys.stderr, conteos_mzas
 
+        """
         sql = ("select mza, lado, sum(conteo)::int from segmentacion.conteos"
             + sql_where_pdfr(prov, dpto, frac, radio)
             + "\ngroup by mza, lado;")
         cur.execute(sql)
         result = cur.fetchall()
+
         conteos_lados = [((mza, lado), conteo) for mza, lado, conteo in result]
-        lados = [(mza, lado) for mza, lado, conteo in result]
+        """
+        conteos = dao.get_conteos_lados(_table, prov, dpto, frac, radio)
+        conteos_lados = [((mza, lado), conteo) for mza, lado, conteo in conteos]
+        lados = [(mza, lado) for mza, lado, conteo in conteos]
 
 #        print >> sys.stderr, "conteos_lados"
 #        print >> sys.stderr, conteos_lados
 
-
+        """
         sql = ("select mza, max(lado) from segmentacion.conteos"
             + sql_where_pdfr(prov, dpto, frac, radio)
             + "\ngroup by mza;")
         cur.execute(sql)
         mza_ultimo_lado = cur.fetchall()
+        """
+        mza_ultimo_lado = dao.get_ultimo_lado_mzas(_table, prov, dpto, frac, radio)
 
 
         # eliminar rutas o av
         excluir = " " #" and not (tipo like 'RUTA%' or tipo like 'CURSO DE AGUA%' or tipo like 'LINEA FERREA%')"
 
+        """
         sql = ("select mza, mza_ady from segmentacion.adyacencias"
             + sql_where_pdfr(prov, dpto, frac, radio)
             + "\n and mza != mza_ady" + excluir
@@ -316,7 +337,11 @@ for prov, dpto, frac, radio in radios:
 #        print(sql)
         cur.execute(sql)
         adyacencias_mzas_mzas = cur.fetchall()
+        """
+        adyacencias = dao.get_adyacencias_mzas_mzas(_table, prov, dpto, frac, radio)
+        adyacencias_mzas_mzas = adyacencias
 
+        """
         sql = ("select mza, mza_ady, lado_ady from segmentacion.adyacencias"
             + sql_where_pdfr(prov, dpto, frac, radio)
             + "\n and mza != mza_ady" + excluir
@@ -324,7 +349,11 @@ for prov, dpto, frac, radio in radios:
         cur.execute(sql)
         result = cur.fetchall()
         adyacencias_mzas_lados = [(mza, (mza_ady, lado_ady)) for mza, mza_ady, lado_ady in result]
-
+        """
+        adyacencias = dao.get_adyacencias_mzas_lados(_table, prov, dpto, frac, radio)
+        adyacencias_mzas_lados = [(mza, (mza_ady, lado_ady)) for mza, mza_ady, lado_ady in adyacencias]
+    
+        """
         sql = ("select mza, lado, mza_ady from segmentacion.adyacencias"
             + sql_where_pdfr(prov, dpto, frac, radio)
             + "\n and mza != mza_ady" + excluir
@@ -332,7 +361,11 @@ for prov, dpto, frac, radio in radios:
         cur.execute(sql)
         result = cur.fetchall()
         adyacencias_lados_mzas= [((mza, lado), mza_ady) for mza, lado, mza_ady in result]
+        """
+        adyacencias = dao.get_adyacencias_lados_mzas(_table, prov, dpto, frac, radio)
+        adyacencias_lados_mzas= [((mza, lado), mza_ady) for mza, lado, mza_ady in adyacencias]
 
+        """
         sql = ("select mza, lado, mza_ady, lado_ady from segmentacion.adyacencias"
             + sql_where_pdfr(prov, dpto, frac, radio)
             + "\n and mza != mza_ady" + excluir
@@ -340,6 +373,10 @@ for prov, dpto, frac, radio in radios:
         cur.execute(sql)
         result = cur.fetchall()
         lados_enfrentados = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady in result]
+        """
+        adyacencias = dao.get_adyacencias_lados_lados(_table, prov, dpto, frac, radio)
+        lados_enfrentados = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady in adyacencias]
+
 
         lados_contiguos = []
         for mza, lado in lados:
@@ -492,6 +529,8 @@ for prov, dpto, frac, radio in radios:
 # update _table = shapes.eAAAAa  (usando lados)
 #------
             for cpte in componentes:
+               dao.set_componente_segmento(_table, prov, dpto, frac, radio, cpte, segmentos[cpte])
+            """
                 sql = ("update " + _table   
                     + " set segi = " + str(segmentos[cpte])
                     + sql_where_PPDDDLLLMMM(prov, dpto, frac, radio, cpte, 'i')
@@ -507,6 +546,7 @@ for prov, dpto, frac, radio in radios:
                 #print (" ", sql)
                 cur.execute(sql)
             conn.commit()
+            """
 #            raw_input("Press Enter to continue...")
         else:
             print ("sin adyacencias")
@@ -524,8 +564,9 @@ user = getpass.getuser()
 user_host = user + '@' + host
 comando = " ".join(sys.argv[:])
 print('[' + user_host + ']$ python ' + pwd + '/' + comando)
-print(":".join(conexion))
+print(":".join(dao.conn_info))
 
+"""
 sql = ("delete from corrida "
      + sql_where_pdfr(_prov, _dpto, _frac, _radio)
      + "\n;")
@@ -546,3 +587,5 @@ sql = ("insert into corrida (comando, user_host, pwd, conexion, prov, dpto, frac
 cur.execute(sql)
 conn.commit()
 conn.close()
+"""
+
