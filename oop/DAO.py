@@ -38,7 +38,8 @@ class DAO:
         except psycopg2.Error as e:
             print ('cannot connect', db_string)
             print (e)
-        return self.conn
+        self.cur = self.conn.cursor()
+        return 
 
     def __str__(self):
         return self.conn_info
@@ -51,53 +52,89 @@ class DAO:
            " from " + region + ".listado"
            " order by prov::integer, dpto::integer, frac::integer, radio::integer;")
         try:
-            cur.execute(sql)
-            self.radios = cur.fetchall()
+            self.cur.execute(sql)
+            self.radios = self.cur.fetchall()
         except psycopg2.Error as e:
             print ('q cagada :-(', region)
             print (e)
         return self.radios
 
-    def listado(self, region):
+    def get_listado(self, region):
         sql = 'select * from "' + region + '".listado'
         try:
-            cur.execute(sql)
-            self.listado = cur.fetchall()
+            self.cur.execute(sql)
+            listado = self.cur.fetchall()
             return listado
         except psycopg2.Error as e:
             print ('q cagada :-(', region)
             print (e)
 
-    def adyacencias(self, region):
+    def get_adyacencias(self, region):
         sql = 'select * from "' + region + '".lados_adyacentes'
         try:
-            cur.execute(sql)
-            adyacencias = cur.fetchall()
+            self.cur.execute(sql)
+            adyacencias = self.cur.fetchall()
             return adyacencias
         except psycopg2.Error as e:
             print ('q cagada :-(', region)
             print (e)
 
+    def sql_where_PPDDDLLLMMM(prov, depto, frac, radio, cpte, side):
+        if type(cpte) is int:
+            mza = cpte
+        elif type(cpte) is tuple:
+            (mza, lado) = cpte
+            where_mza = ("\nwhere substr(mza" + side + ",1,2)::integer = " + str(prov)
+                + "\n and substr(mza" + side + ",3,3)::integer = " + str(depto)
+                + "\n and substr(mza" + side + ",9,2)::integer = " + str(frac)
+                + "\n and substr(mza" + side + ",11,2)::integer = " + str(radio)
+                + "\n and substr(mza" + side + ",13,3)::integer = " + str(mza)
+                )
+        if type(cpte) is tuple:
+            where_mza = (where_mza 
+            + "\n and lado" + side + "::integer = " + str(lado))
+        return where_mza
+
+    def set_componente_segmento(self, region, prov, dpto, frac, radio, cpte, seg):
+    #------
+    # update table = region.arc  (usando lados)
+    #------
+         sql_i = ("update " + region + '.arc'
+            + " set segi = " + str(seg)
+            + sql_where_PPDDDLLLMMM(prov, depto, frac, radio, cpte, 'i')
+            + " AND mzai is not null AND mzai != ''"
+            + "\n;")
+         #print "", sql_i
+         self.cur.execute(sql_i)
+         sql_d = ("update " + region + '.arc'   
+            + " set segd = " + str(seg)
+            + sql_where_PPDDDLLLMMM(prov, depto, frac, radio, cpte, 'd')
+            + " AND mzad is not null AND mzad != ''"
+            + "\n;")
+         #print " ", sql_d
+         self.cur.execute(sql_d)
+         self.conn.commit()
+        
  
 
 dao = DAO()
 #conn = dao.db()
 #conn = dao.db('a')
 #conn = dao.db('u:p:d')
-conn = dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
-print (conn) # xq no usa __str__ ?
-cur = conn.cursor()
-print (cur)
+dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
+print (dao.conn) # xq no usa __str__ ?
+print (dao.cur)
 
 #radios = dao.radios(1)
 #radios = dao.radios('1')
 radios = dao.radios('e0298')
 print (radios)
 
-#listado = dao.listado('e0298')
+#listado = dao.get_listado('e0298')
 #print (listado)
 
-adyacencias = dao.adyacencias('0365')
+adyacencias = dao.get_adyacencias('0365')
 print (adyacencias)
+
 
 
