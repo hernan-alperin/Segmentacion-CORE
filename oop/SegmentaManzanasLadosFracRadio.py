@@ -227,9 +227,9 @@ import psycopg2
 import operator
 import time
 
-from DAO import DAO
+import DAO
 
-dao = DAO()
+dao = DAO.DAO()
 dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
 
 radios = dao.get_radios(_table)
