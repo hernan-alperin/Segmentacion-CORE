@@ -44,7 +44,7 @@ class DAO:
     def __str__(self):
         return self.conn_info
 
-    def radios(self, region):
+    def get_radios(self, region):
         # checkear que region es string y existe como schema, si no raise
         if not isinstance(region, str):
             raise Exception(region + 'debe ser de tipo string')
@@ -124,7 +124,7 @@ class DAO:
             print (e)
 
     def get_adyacencias_mzas_mzas(self, region, prov, dpto, frac, radio):
-        sql = ('select substr(mza_i,13,3), substr(mza_j,13,3) from "' + region + '".lados_adyacentes'
+        sql = ('select substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
             + "\ngroup by mza_i, mza_j;\n")
@@ -137,7 +137,7 @@ class DAO:
             print (e)
 
     def get_adyacencias_mzas_lados(self, region, prov, dpto, frac, radio):
-        sql = ('select substr(mza_i,13,3), substr(mza_j,13,3), lado_j from "' + region + '".lados_adyacentes'
+        sql = ('select substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
             + "\ngroup by mza_i, mza_j, lado_j;\n")
@@ -150,7 +150,7 @@ class DAO:
             print (e)
 
     def get_adyacencias_lados_mzas(self, region, prov, dpto, frac, radio):
-        sql = ('select substr(mza_i,13,3), lado_i, substr(mza_j,13,3) from "' + region + '".lados_adyacentes'
+        sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
             + "\ngroup by mza_i, lado_i, mza_j;\n")
@@ -163,7 +163,7 @@ class DAO:
             print (e)
 
     def get_adyacencias_lados_lados(self, region, prov, dpto, frac, radio):
-        sql = ('select substr(mza_i,13,3), lado_i, substr(mza_j,13,3), lado_j from "' + region + '".lados_adyacentes'
+        sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
             + "\ngroup by mza_i, lado_i, mza_j, lado_j;\n")
