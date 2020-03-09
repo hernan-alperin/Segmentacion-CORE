@@ -134,3 +134,6 @@ data
 lados_completos/test.sql
 manzanas_independientes/chequear_estructura_c1.sql
 
+# ignore
+.gitignore
+
