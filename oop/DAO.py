@@ -102,7 +102,8 @@ class DAO:
     def get_ultimo_lado_mzas(self, region, prov, dpto, frac, radio):
         sql = ('select mza, max(lado) from "' + region + '".conteos'
             + self.sql_where_pdfr(prov, dpto, frac, radio)
-            + '\ngroup by mza, lado;')
+            + '\ngroup by mza order by mza;')
+        print (sql)
         try:
             self.cur.execute(sql)
             conteos = self.cur.fetchall()
@@ -127,7 +128,7 @@ class DAO:
         sql = ('select substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
-            + "\ngroup by mza_i, mza_j;\n")
+            + "\norder by substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer;\n")
         try:
             self.cur.execute(sql)
             adyacencias = self.cur.fetchall()
@@ -140,7 +141,8 @@ class DAO:
         sql = ('select substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
-            + "\ngroup by mza_i, mza_j, lado_j;\n")
+            + "\norder by substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer, lado_j;\n"
+            )
         try:
             self.cur.execute(sql)
             adyacencias = self.cur.fetchall()
@@ -153,7 +155,8 @@ class DAO:
         sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
-            + "\ngroup by mza_i, lado_i, mza_j;\n")
+            + "\norder by substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer;\n"
+            )
         try:
             self.cur.execute(sql)
             adyacencias = self.cur.fetchall()
@@ -166,7 +169,8 @@ class DAO:
         sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j"
-            + "\ngroup by mza_i, lado_i, mza_j, lado_j;\n")
+            + "\norder by substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j;\n"
+            )
         try:
             self.cur.execute(sql)
             adyacencias = self.cur.fetchall()

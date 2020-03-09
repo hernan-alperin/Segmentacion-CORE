@@ -301,7 +301,7 @@ for prov, dpto, frac, radio in radios:
         adyacencias.extend([((mza, lado), (mza_ady, lado_ady))
                         for (mza, lado), (mza_ady, lado_ady) in lados_contiguos])
         # se agregan los lados correspondientes a esas manzanas
-
+        print ((adyacencias))
         #print >> sys.stderr, "componentes"
         #print >> sys.stderr, componentes
 
