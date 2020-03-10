@@ -302,8 +302,8 @@ for prov, dpto, frac, radio in radios:
 
         sql = ("select mza, max(lado) from segmentacion.conteos"
             + sql_where_pdfr(prov, dpto, frac, radio)
-            + "\ngroup by mza;")
-        print (sql)
+            + "\ngroup by mza order by mza;")
+        #print (sql)
         cur.execute(sql)
         mza_ultimo_lado = cur.fetchall()
 
@@ -359,6 +359,8 @@ for prov, dpto, frac, radio in radios:
             else:
                 lados_contiguos.append(((mza, lado),(mza, lado - 1)))
                 lados_contiguos.append(((mza, lado),(mza, lado + 1)))
+        print (lados_contiguos)
+        # acá hay un bug... 
 
         conteos = conteos_mzas
         adyacencias = adyacencias_mzas_mzas
@@ -388,7 +390,7 @@ for prov, dpto, frac, radio in radios:
         adyacencias.extend([((mza, lado), (mza_ady, lado_ady))
                         for (mza, lado), (mza_ady, lado_ady) in lados_contiguos])
         # se agregan los lados correspondientes a esas manzanas
-        print ((adyacencias))
+        #print ((adyacencias))
 
         #print >> sys.stderr, "componentes"
         #print >> sys.stderr, componentes
