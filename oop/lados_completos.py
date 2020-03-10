@@ -85,6 +85,22 @@ def cuantas_manzanas(estos):
     mzas.extend([cmpt for cmpt in estos if type(cmpt) is int])
     return len(set(mzas))
 
+def adyacencias_componentes(estos):
+    #return [este for este in estos]
+    return [(este, ese) for este in estos for ese in estos if (este, ese) in adyacencias]
+
+def costo_adyacencia(esta):
+    (este, ese) = esta
+    if type(este) is int:
+        este = (este, 0)
+    if type(ese) is int:
+        ese = (ese, 0)
+    costos = [c_a[2] for c_a in costos_adyacencias if (c_a[0], c_a[1]) == (este, ese)]
+    if costos:
+        return costos[0]
+    
+    
+
 
 #################################################################################
 #
@@ -112,6 +128,8 @@ def costo(segmento):
     # segmento es una lista de manzanas
     carga_segmento = carga(segmento)
     mzas_segmento = cuantas_manzanas(segmento)
+    adyacencias_segmento = adyacencias_componentes(segmento)
+    costo_adyacencias = sum(costo_adyacencia(ady) for ady in adyacencias_segmento if costo_adyacencia(ady))
     if carga_segmento > cantidad_de_viviendas_maxima_deseada_por_segmento:
         # la carga es mayor el costo es el cubo
         costo = (abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
@@ -129,7 +147,7 @@ def costo(segmento):
     else:  # está entre los valores deseados
         # el costo el la diferencia absoluta al valor esperado
         costo = abs(carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
-    return costo + 10*mzas_segmento
+    return costo + 5*mzas_segmento + 100*costo_adyacencias
 
     """
     # otro caso, costo en rango, cuadrático por arriba y lineal por abajo
@@ -254,7 +272,9 @@ for prov, dpto, frac, radio in radios:
         conteos_lados = [((mza, lado), conteo) for mza, lado, conteo in conteos]
         lados = [(mza, lado) for mza, lado, conteo in conteos]
 
-        mza_ultimo_lado = dao.get_ultimo_lado_mzas(_table, prov, dpto, frac, radio)
+        costos_adyacencias = [((mza, lado), (mza_ady, lado_ady), costo) for mza, lado, mza_ady, lado_ady, costo 
+            in dao.get_costos_adyacencias(_table, prov, dpto, frac, radio)]
+        #print (costos_adyacencias)
 
         adyacencias_mzas_mzas = dao.get_adyacencias_mzas_mzas(_table, prov, dpto, frac, radio)
 
@@ -266,11 +286,11 @@ for prov, dpto, frac, radio in radios:
 
         lados_enfrentados = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady 
             in dao.get_adyacencias_lados_enfrentados(_table, prov, dpto, frac, radio)]
-        print ('lados_enfrentados', lados_enfrentados)
+#        print ('lados_enfrentados', lados_enfrentados)
 
         lados_contiguos = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady
             in dao.get_adyacencias_lados_contiguos(_table, prov, dpto, frac, radio)]
-        print ('lados_contiguos', lados_contiguos)
+#       print ('lados_contiguos', lados_contiguos)
 
         conteos = conteos_mzas
         adyacencias = adyacencias_mzas_mzas
@@ -279,7 +299,7 @@ for prov, dpto, frac, radio in radios:
         conteos_excedidos = [(manzana, conteo) for (manzana, conteo) in conteos_mzas
                             if conteo > cantidad_de_viviendas_permitida_para_romper_manzana]
         mzas_excedidas = [mza for mza, conteo in conteos_excedidos]
-        print ('manzanas excedidas:', mzas_excedidas)
+#        print ('manzanas excedidas:', mzas_excedidas)
 
         componentes = [mza for mza in manzanas if mza not in mzas_excedidas]
         conteos = [(mza, conteo) for (mza, conteo) in conteos if mza not in mzas_excedidas]
@@ -389,7 +409,10 @@ for prov, dpto, frac, radio in radios:
                 print (["segmento", s+1, 
                    "carga", carga(segmento), 
                    "costo", costo(segmento), 
-                   "componentes", segmento])
+                   "componentes", segmento,
+#                   "adyacencias", adyacencias_componentes(segmento),
+                   "costo_adyacencias", sum([costo_adyacencia(ady) for ady in adyacencias_componentes(segmento) if costo_adyacencia(ady)])
+                    ])
 
             print ("deseada: %d, máxima: %d, mínima: %d" % (cantidad_de_viviendas_deseada_por_segmento,
                 cantidad_de_viviendas_maxima_deseada_por_segmento, 

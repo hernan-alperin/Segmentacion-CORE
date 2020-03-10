@@ -113,14 +113,36 @@ class DAO:
 
 
 
-    def get_adyacencias(self, region):
-        sql = 'select * from "' + region + '".lados_adyacentes\n'
+    def get_costos_adyacencias(self, region, prov, dpto, frac, radio):
+        sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j, indec.costo_adyacencias(arc_tipo, arc_codigo) '
+            + '\nfrom "' + region + '".lados_adyacentes\n'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and substr(mza_i,13,3)::integer != substr(mza_j,13,3)::integer"
+            + "\nunion"
+            + "\nselect substr(mza_i,13,3)::integer, 0, substr(mza_j,13,3)::integer, 0, max(indec.costo_adyacencias(arc_tipo, arc_codigo))"
+            + '\nfrom "' + region + '".lados_adyacentes\n'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and substr(mza_i,13,3)::integer != substr(mza_j,13,3)::integer"
+            + "\n group by substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer"
+            + "\nunion"
+            + "\nselect substr(mza_i,13,3)::integer, 0, substr(mza_j,13,3)::integer, lado_j, max(indec.costo_adyacencias(arc_tipo, arc_codigo)) "
+            + '\nfrom "' + region + '".lados_adyacentes\n'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and substr(mza_i,13,3)::integer != substr(mza_j,13,3)::integer"
+            + "\n group by substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer, lado_j"
+            + "\nunion"
+            + "\nselect substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, 0, max(indec.costo_adyacencias(arc_tipo, arc_codigo)) "
+            + '\nfrom "' + region + '".lados_adyacentes\n'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and substr(mza_i,13,3)::integer != substr(mza_j,13,3)::integer"
+            + "\n group by substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer"
+            )
         try:
             self.cur.execute(sql)
             adyacencias = self.cur.fetchall()
             return adyacencias
         except psycopg2.Error as e:
-            print ('no puede cargar adyacentes: \n' + sql, region)
+            print ('no puede cargar costos adyacentes: \n' + sql, region)
             print (e)
 
     def get_adyacencias_mzas_mzas(self, region, prov, dpto, frac, radio):
