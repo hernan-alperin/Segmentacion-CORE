@@ -156,7 +156,14 @@ def seg_id(segmento):
         return (min_mza, 0)
     else: 
         return (min_m, min_l)
-    
+
+def cmpt_id(cmpt):
+    if type(cmpt) is tuple:
+        return cmpt
+    else:
+        return (cmpt, 0)
+ 
+        
     
 
 #####################################################################################
@@ -239,6 +246,7 @@ for prov, dpto, frac, radio in radios:
     if (radio and prov == _prov and dpto == _dpto and frac == _frac and radio == _radio): # las del _table
         print
         print ("radio: ")
+        print (prov, dpto, frac, radio)
         conteos_mzas = dao.get_conteos_mzas(_table, prov, dpto, frac, radio)
         manzanas = [mza for mza, conteo in conteos_mzas]
 
@@ -257,21 +265,12 @@ for prov, dpto, frac, radio in radios:
             in dao.get_adyacencias_lados_mzas(_table, prov, dpto, frac, radio)]
 
         lados_enfrentados = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady 
-            in dao.get_adyacencias_lados_lados(_table, prov, dpto, frac, radio)]
+            in dao.get_adyacencias_lados_enfrentados(_table, prov, dpto, frac, radio)]
+        print ('lados_enfrentados', lados_enfrentados)
 
-
-        lados_contiguos = []
-        for mza, lado in lados:
-            ultimo_lado = next(ultimo for mza, ultimo in mza_ultimo_lado)
-            if lado == 1:
-                lados_contiguos.append(((mza, lado),(mza, ultimo_lado)))
-                lados_contiguos.append(((mza, lado),(mza, lado + 1)))
-            elif lado == ultimo_lado:
-                lados_contiguos.append(((mza, lado),(mza, lado - 1)))
-                lados_contiguos.append(((mza, lado),(mza, 1)))
-            else:
-                lados_contiguos.append(((mza, lado),(mza, lado - 1)))
-                lados_contiguos.append(((mza, lado),(mza, lado + 1)))
+        lados_contiguos = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady
+            in dao.get_adyacencias_lados_contiguos(_table, prov, dpto, frac, radio)]
+        print ('lados_contiguos', lados_contiguos)
 
         conteos = conteos_mzas
         adyacencias = adyacencias_mzas_mzas
@@ -280,6 +279,7 @@ for prov, dpto, frac, radio in radios:
         conteos_excedidos = [(manzana, conteo) for (manzana, conteo) in conteos_mzas
                             if conteo > cantidad_de_viviendas_permitida_para_romper_manzana]
         mzas_excedidas = [mza for mza, conteo in conteos_excedidos]
+        print ('manzanas excedidas:', mzas_excedidas)
 
         componentes = [mza for mza in manzanas if mza not in mzas_excedidas]
         conteos = [(mza, conteo) for (mza, conteo) in conteos if mza not in mzas_excedidas]
@@ -301,7 +301,7 @@ for prov, dpto, frac, radio in radios:
         adyacencias.extend([((mza, lado), (mza_ady, lado_ady))
                         for (mza, lado), (mza_ady, lado_ady) in lados_contiguos])
         # se agregan los lados correspondientes a esas manzanas
-        print ((adyacencias))
+        #print ((adyacencias))
         #print >> sys.stderr, "componentes"
         #print >> sys.stderr, componentes
 
@@ -385,6 +385,7 @@ for prov, dpto, frac, radio in radios:
             print ("mínimo local")
             print ("costo", costo_minimo)
             for s, segmento in enumerate(mejor_solucion):
+                segmento.sort(key = cmpt_id)
                 print (["segmento", s+1, 
                    "carga", carga(segmento), 
                    "costo", costo(segmento), 
@@ -430,27 +431,7 @@ user_host = user + '@' + host
 comando = " ".join(sys.argv[:])
 print('[' + user_host + ']$ python ' + pwd + '/' + comando)
 print(":".join(dao.conn_info))
+import datetime
 
-"""
-sql = ("delete from corrida "
-     + sql_where_pdfr(_prov, _dpto, _frac, _radio)
-     + "\n;")
-#print ("", sql)
-cur.execute(sql)
-
-sql = ("insert into corrida (comando, user_host, pwd, conexion, prov, dpto, frac, radio) values"
-     + " ('" + str(comando) 
-     + "', '" + str(user_host)
-     + "', '" + str(pwd)
-     + "', '" + str(":".join(conexion))
-     + "', " + str(_prov)
-     + " , " + str(_dpto)
-     + " , " + str(_frac)
-     + " , " + str(_radio)
-     + ")\n;")
-#print ("", sql)
-cur.execute(sql)
-conn.commit()
-conn.close()
-"""
+dao.set_corrida(comando, user_host, pwd, prov, dpto, frac, radio, datetime.datetime.now())
 

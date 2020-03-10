@@ -103,7 +103,6 @@ class DAO:
         sql = ('select mza, max(lado) from "' + region + '".conteos'
             + self.sql_where_pdfr(prov, dpto, frac, radio)
             + '\ngroup by mza order by mza;')
-        print (sql)
         try:
             self.cur.execute(sql)
             conteos = self.cur.fetchall()
@@ -179,7 +178,36 @@ class DAO:
             print ('no puede cargar adyacentes: \n' + sql, region)
             print (e)
 
-        
+    
+    def get_adyacencias_lados_enfrentados(self, region, prov, dpto, frac, radio):
+        sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and mza_i != mza_j and tipo = 'enfrente'"
+            + "\norder by substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j;\n"
+            )
+        try:
+            self.cur.execute(sql)
+            adyacencias = self.cur.fetchall()
+            return adyacencias
+        except psycopg2.Error as e:
+            print ('no puede cargar adyacentes: \n' + sql, region)
+            print (e)
+
+
+    def get_adyacencias_lados_contiguos(self, region, prov, dpto, frac, radio):
+        sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
+            + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
+            + "\n and tipo = 'dobla'\n"
+            + "\norder by substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j;\n"
+            )
+        try:
+            self.cur.execute(sql)
+            adyacencias = self.cur.fetchall()
+            return adyacencias
+        except psycopg2.Error as e:
+            print ('no puede cargar adyacentes: \n' + sql, region)
+            print (e)
+
 
     def sql_where_PPDDDLLLFFRR(self, prov, depto, frac, radio):
         where_mza = ("\nwhere substr(mza_i,1,2)::integer = " + str(prov)
@@ -226,6 +254,28 @@ class DAO:
          #print " ", sql_d
          self.cur.execute(sql_d)
          self.conn.commit()
+
+    def set_corrida(self, comando, user_host, pwd, prov, dpto, frac, radio, cuando):
+        sql = ("insert into corrida (comando, user_host, pwd, conexion, prov, dpto, frac, radio, cuando) values"
+             + " ('" + str(comando)
+             + "', '" + str(user_host)
+             + "', '" + str(pwd)
+             + "', '" + str(":".join(self.conn_info))
+             + "', " + str(prov)
+             + " , " + str(dpto)
+             + " , " + str(frac)
+             + " , " + str(radio)
+             + " , '" + str(cuando)
+             + "')\n;")
+
+        try:
+            self.cur.execute(sql)
+            self.conn.commit()
+        except psycopg2.Error as e:
+            print ('no puede cargar datos de corrida: \n' + sql)
+            print (e)
+            
+            
         
  
 """
