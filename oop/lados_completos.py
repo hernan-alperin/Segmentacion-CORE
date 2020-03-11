@@ -202,6 +202,26 @@ def costo_segmentacion(segmentacion):
 
 # definicón del vecindario de una segmentacíon para definir y recorrer la red de segementaciones
 # vecindario devuelve array de vecinos usando extraer y transferir 
+
+def vecinos(segmento, segmentacion):
+    sgm = list(segmento)
+    vecinos = []
+    # extracciones
+    for este in sgm:
+        sgm2 = list(segmento)
+        vecinos.append(este)
+        vecinos.extend(extraer(este, sgm2))
+    # transferencias
+    for este in sgm:
+        for otro in segmentacion:
+            for ese in otro:
+                if (este, ese) in adyacencias:
+                    otr = list(otro)
+                    # vecinos.extend(extraer(este, list(segmento)))
+                    # ya agregado en extracciones
+                    vecinos.append(otr.append(este))
+    return vecinos    
+
 def vecindario(segmentacion):
     # devuelve array de vecinos
     vecindario = []
@@ -232,14 +252,16 @@ def vecindario(segmentacion):
                         transferencia = transferir(cada, este, ese)
                         if transferencia: # se pudo hacer 
                             vecino = transferencia + aquella
+                    #        print ('transferí', cada, este, ese)
                             vecindario.append(vecino)
                 # fusión de 2 segmentos evitando repeticiones 
                 #(cuando alguno es una solo elemento la fusion es considerada en la transferencia)
                 if len(este) > 1 and len(ese) > 1 and conectados(este + ese):
                     vecino = [este + ese] + aquella
+                    #print ('transferí', cada, este, ese)
                     vecindario.append(vecino) # analizar fusiones
     return vecindario
-# no devuelve repeticiones
+# devuelve repeticiones
 
 #
 # optimización
@@ -299,7 +321,13 @@ for prov, dpto, frac, radio in radios:
         conteos_excedidos = [(manzana, conteo) for (manzana, conteo) in conteos_mzas
                             if conteo > cantidad_de_viviendas_permitida_para_romper_manzana]
         mzas_excedidas = [mza for mza, conteo in conteos_excedidos]
-#        print ('manzanas excedidas:', mzas_excedidas)
+        
+        lados_excedidos = [(mza, lado) for ((mza, lado), conteo) in conteos_lados
+                            if conteo > cantidad_de_viviendas_permitida_para_romper_manzana]
+
+        print ('manzanas a partir:', mzas_excedidas)
+        print ('lados excedidas:', lados_excedidos)
+
 
         componentes = [mza for mza in manzanas if mza not in mzas_excedidas]
         conteos = [(mza, conteo) for (mza, conteo) in conteos if mza not in mzas_excedidas]
@@ -324,6 +352,20 @@ for prov, dpto, frac, radio in radios:
         #print ((adyacencias))
         #print >> sys.stderr, "componentes"
         #print >> sys.stderr, componentes
+#
+#        adyacencias.extend((ese, este) for (este, ese) in adyacencias)
+#        adyacencias = list(set(adyacencias))
+
+#        print (adyacencias)
+        adyacencias = [(este, ese) for (este, ese) in adyacencias if este not in lados_excedidos and ese not in lados_excedidos]
+#        print (adyacencias)
+#        print (lados_excedidos)
+#        print (componentes)
+        componentes = list(set(componentes) - set(lados_excedidos))
+#        print (componentes)
+
+
+        # elimina lado con más de cant deseada para aplicarles el otro algoritmo
 
 #---- hasta acá
 
@@ -349,6 +391,7 @@ for prov, dpto, frac, radio in radios:
                 adyacentes[cpte] = list([])
             for cpte, adyacente in adyacencias:
                 adyacentes[cpte] = adyacentes[cpte] + [adyacente]
+                adyacentes[adyacente] = adyacentes[adyacente] + [cpte]
 #            for manzana in sorted(adyacentes.iterkeys()):
 #                print (manzana, adyacentes[manzana])
 
@@ -382,7 +425,7 @@ for prov, dpto, frac, radio in radios:
                   while min(costos_vecinos) < costo_actual: # se puede mejorar 
                       min_id, mejor_costo = min(enumerate(costos_vecinos), key=operator.itemgetter(1))
                       solucion = vecinos[min_id] # greedy
-  #                    print >> sys.stderr, mejor_costo
+                      # print (mejor_costo)
                       vecinos = list(vecindario(solucion))
                       costo_actual = mejor_costo 
                       # costos_vecinos = map(costo_segmentacion, vecinos)
@@ -410,9 +453,11 @@ for prov, dpto, frac, radio in radios:
                    "carga", carga(segmento), 
                    "costo", costo(segmento), 
                    "componentes", segmento,
+                    "cuantas_manzanas", cuantas_manzanas(segmento)
 #                   "adyacencias", adyacencias_componentes(segmento),
-                   "costo_adyacencias", sum([costo_adyacencia(ady) for ady in adyacencias_componentes(segmento) if costo_adyacencia(ady)])
+#                   "costo_adyacencias", sum([costo_adyacencia(ady) for ady in adyacencias_componentes(segmento) if costo_adyacencia(ady)])
                     ])
+#            print ((vecindario(mejor_solucion)))
 
             print ("deseada: %d, máxima: %d, mínima: %d" % (cantidad_de_viviendas_deseada_por_segmento,
                 cantidad_de_viviendas_maxima_deseada_por_segmento, 
