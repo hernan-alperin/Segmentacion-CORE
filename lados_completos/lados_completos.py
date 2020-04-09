@@ -280,7 +280,6 @@ import os
 import DAO
 
 dao = DAO.DAO()
-#dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
 conexion = [
     os.environ.get('MANDARINA_USER', 'alpe'),
     os.environ.get('MANDARINA_PASS', 'alpe'),
@@ -343,7 +342,6 @@ for prov, dpto, frac, radio in radios:
         print ('manzanas a partir:', mzas_excedidas)
         print ('lados excedidos:', lados_excedidos)
 
-
         componentes = [mza for mza in manzanas if mza not in mzas_excedidas]
         conteos = [(mza, conteo) for (mza, conteo) in conteos if mza not in mzas_excedidas]
         adyacencias = [(mza, mza_ady) for (mza, mza_ady) in adyacencias 
@@ -374,9 +372,6 @@ for prov, dpto, frac, radio in radios:
 #        print (adyacencias)
         if len(sys.argv) > 11 and sys.argv[11] == 'filtrar':
             adyacencias = [(este, ese) for (este, ese) in adyacencias if este not in lados_excedidos and ese not in lados_excedidos]
-#        print (adyacencias)
-#        print (lados_excedidos)
-#        print (componentes)
             componentes = list(set(componentes) - set(lados_excedidos))
 #        print (componentes)
 
