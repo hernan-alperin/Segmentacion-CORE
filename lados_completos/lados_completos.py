@@ -4,6 +4,8 @@ sys.path.append('.')
 from decimal import *
 print (sys.argv[1:])
 _table = sys.argv[1]
+parametro1 = _table.split('.')
+_table = parametro1[0]
 _prov = int(sys.argv[2])
 _dpto = int(sys.argv[3])
 _frac = int(sys.argv[4])
@@ -273,12 +275,24 @@ def vecindario(segmentacion):
 import psycopg2
 import operator
 import time
+import os
 
 import DAO
 
 dao = DAO.DAO()
-#dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
-dao.db('halpe:halpe:CPHyV2020:172.26.68.174')
+conexion = [
+    os.environ.get('MANDARINA_USER', 'alpe'),
+    os.environ.get('MANDARINA_PASS', 'alpe'),
+    os.environ.get('MANDARINA_DATABASE', 'CPHyV2020'),
+    os.environ.get('MANDARINA_HOST', 'localhost'),
+    os.environ.get('MANDARINA_PORT', '5432')
+]
+#conexion = ["censo2020", "segmentador", "rodatnemges", "172.26.67.239", "5432"]
+if len(sys.argv) > 10:
+    conn_str = sys.argv[10]
+else:
+    conn_str = ':'.join(conexion)
+dao.db(conn_str)
 
 radios = dao.get_radios(_table)
 
@@ -326,8 +340,7 @@ for prov, dpto, frac, radio in radios:
                             if conteo > cantidad_de_viviendas_permitida_para_romper_manzana]
 
         print ('manzanas a partir:', mzas_excedidas)
-        print ('lados excedidas:', lados_excedidos)
-
+        print ('lados excedidos:', lados_excedidos)
 
         componentes = [mza for mza in manzanas if mza not in mzas_excedidas]
         conteos = [(mza, conteo) for (mza, conteo) in conteos if mza not in mzas_excedidas]
@@ -357,11 +370,9 @@ for prov, dpto, frac, radio in radios:
 #        adyacencias = list(set(adyacencias))
 
 #        print (adyacencias)
-        adyacencias = [(este, ese) for (este, ese) in adyacencias if este not in lados_excedidos and ese not in lados_excedidos]
-#        print (adyacencias)
-#        print (lados_excedidos)
-#        print (componentes)
-        componentes = list(set(componentes) - set(lados_excedidos))
+        if len(sys.argv) > 11 and sys.argv[11] == 'filtrar':
+            adyacencias = [(este, ese) for (este, ese) in adyacencias if este not in lados_excedidos and ese not in lados_excedidos]
+            componentes = list(set(componentes) - set(lados_excedidos))
 #        print (componentes)
 
 
@@ -497,8 +508,8 @@ import getpass
 user = getpass.getuser()
 user_host = user + '@' + host
 comando = " ".join(sys.argv[:])
-print('[' + user_host + ']$ python ' + pwd + '/' + comando)
-print(":".join(dao.conn_info))
+#print('[' + user_host + ']$ python ' + pwd + '/' + comando)
+#print(":".join(dao.conn_info))
 import datetime
 
 dao.set_corrida(comando, user_host, pwd, prov, dpto, frac, radio, datetime.datetime.now())

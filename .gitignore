@@ -128,8 +128,14 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# especificos del proyecto
+# dbf files y data
+*.dbf
+data/
 
+# vi swaps
+.*.sw*
+
+# especificos del proyecto
 data
 lados_completos/test.sql
 manzanas_independientes/chequear_estructura_c1.sql
