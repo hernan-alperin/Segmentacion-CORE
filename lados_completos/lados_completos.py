@@ -287,7 +287,7 @@ conexion = [
     os.environ.get('MANDARINA_HOST', 'localhost'),
     os.environ.get('MANDARINA_PORT', '5432')
 ]
-#conexion = ["censo2020", "segmentador", "rodatnemges", "172.26.67.239", "5432"]
+
 if len(sys.argv) > 10:
     conn_str = sys.argv[10]
 else:
@@ -310,32 +310,23 @@ for prov, dpto, frac, radio in radios:
 
         costos_adyacencias = [((mza, lado), (mza_ady, lado_ady), costo) for mza, lado, mza_ady, lado_ady, costo 
             in dao.get_costos_adyacencias(_table, prov, dpto, frac, radio)]
-        #print (costos_adyacencias)
 
         adyacencias_mzas_mzas = dao.get_adyacencias_mzas_mzas(_table, prov, dpto, frac, radio)
-
         adyacencias_mzas_lados = [(mza, (mza_ady, lado_ady)) for mza, mza_ady, lado_ady 
             in dao.get_adyacencias_mzas_lados(_table, prov, dpto, frac, radio)]
-    
         adyacencias_lados_mzas= [((mza, lado), mza_ady) for mza, lado, mza_ady 
             in dao.get_adyacencias_lados_mzas(_table, prov, dpto, frac, radio)]
-
         lados_enfrentados = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady 
             in dao.get_adyacencias_lados_enfrentados(_table, prov, dpto, frac, radio)]
-#        print ('lados_enfrentados', lados_enfrentados)
-
         lados_contiguos = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady
             in dao.get_adyacencias_lados_contiguos(_table, prov, dpto, frac, radio)]
-#       print ('lados_contiguos', lados_contiguos)
 
         conteos = conteos_mzas
         adyacencias = adyacencias_mzas_mzas
 
-
         conteos_excedidos = [(manzana, conteo) for (manzana, conteo) in conteos_mzas
                             if conteo > cantidad_de_viviendas_permitida_para_romper_manzana]
         mzas_excedidas = [mza for mza, conteo in conteos_excedidos]
-        
         lados_excedidos = [(mza, lado) for ((mza, lado), conteo) in conteos_lados
                             if conteo > cantidad_de_viviendas_permitida_para_romper_manzana]
 
@@ -361,19 +352,13 @@ for prov, dpto, frac, radio in radios:
                         if mza in mzas_excedidas and mza_ady in mzas_excedidas])
         adyacencias.extend([((mza, lado), (mza_ady, lado_ady))
                         for (mza, lado), (mza_ady, lado_ady) in lados_contiguos])
-        # se agregan los lados correspondientes a esas manzanas
-        #print ((adyacencias))
-        #print >> sys.stderr, "componentes"
-        #print >> sys.stderr, componentes
 #
 #        adyacencias.extend((ese, este) for (este, ese) in adyacencias)
 #        adyacencias = list(set(adyacencias))
 
-#        print (adyacencias)
         if len(sys.argv) > 11 and sys.argv[11] == 'filtrar':
             adyacencias = [(este, ese) for (este, ese) in adyacencias if este not in lados_excedidos and ese not in lados_excedidos]
             componentes = list(set(componentes) - set(lados_excedidos))
-#        print (componentes)
 
 
         # elimina lado con más de cant deseada para aplicarles el otro algoritmo
@@ -382,7 +367,6 @@ for prov, dpto, frac, radio in radios:
 
         if adyacencias:
             start = time.time()
-#            print (adyacencias)
 
             # crea los dictionary
             componentes_en_adyacencias = list(set([cpte for cpte, cpte_ady in adyacencias]))
@@ -465,16 +449,11 @@ for prov, dpto, frac, radio in radios:
                    "costo", costo(segmento), 
                    "componentes", segmento,
                     "cuantas_manzanas", cuantas_manzanas(segmento)
-#                   "adyacencias", adyacencias_componentes(segmento),
-#                   "costo_adyacencias", sum([costo_adyacencia(ady) for ady in adyacencias_componentes(segmento) if costo_adyacencia(ady)])
                     ])
-#            print ((vecindario(mejor_solucion)))
 
             print ("deseada: %d, máxima: %d, mínima: %d" % (cantidad_de_viviendas_deseada_por_segmento,
                 cantidad_de_viviendas_maxima_deseada_por_segmento, 
                 cantidad_de_viviendas_minima_deseada_por_segmento))
-
-
 
             end = time.time()
             print (str(end - start) + " segundos")
@@ -486,17 +465,13 @@ for prov, dpto, frac, radio in radios:
                 for cpte in segmento:
                     segmentos[cpte] = s + 1
             
-            # por ahora solo junin de los andes buscar la tabla usando una relacion prov, dpto - aglomerado
 #------
 # update _table = shapes.eAAAAa  (usando lados)
 #------
             for cpte in componentes:
                dao.set_componente_segmento(_table, prov, dpto, frac, radio, cpte, segmentos[cpte])
-#            raw_input("Press Enter to continue...")
         else:
             print ("sin adyacencias")
-#    else:
-#        print ("radio Null")
 
 # guarda ejecucion
 import os
@@ -508,6 +483,7 @@ import getpass
 user = getpass.getuser()
 user_host = user + '@' + host
 comando = " ".join(sys.argv[:])
+# no imprime conexion pero la guarda en la DB:public.corridas
 #print('[' + user_host + ']$ python ' + pwd + '/' + comando)
 #print(":".join(dao.conn_info))
 import datetime
