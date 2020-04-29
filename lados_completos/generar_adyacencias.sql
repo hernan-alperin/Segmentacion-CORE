@@ -88,6 +88,7 @@ lado_para_doblar as (
 --  para calcular los lados de cruzar y volver
 
 manzanas_adyacentes as (
+
     select distinct mzad as mza_i, mzai as mza_j, tipo as arc_tipo, codigo20 as arc_codigo
     -- agrega tipo y codigo para calcular costo de pasar a mza adyacente
     from arcos
