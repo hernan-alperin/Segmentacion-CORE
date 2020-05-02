@@ -36,36 +36,28 @@ fecha: Oct/Nov 2019
 */
 
 
- WITH e00 AS (
-         SELECT arc.codigo10,
-            arc.nomencla,
-            arc.codigo20,
-            arc.ancho,
-            arc.anchomed,
-            arc.tipo,
-            arc.nombre,
-            arc.ladoi,
-            arc.ladod,
-            arc.desdei,
-            arc.desded,
-            arc.hastai,
-            arc.hastad,
-            arc.mzai,
-            arc.mzad,
-            arc.codloc20,
-            arc.nomencla10,
-            arc.nomenclai,
-            arc.nomenclad,
+ WITH 
+  e00 AS (
+         SELECT arc.codigo10, arc.nomencla, arc.codigo20,
+            arc.ancho, arc.anchomed, arc.tipo, arc.nombre,
+            arc.ladoi, arc.ladod,
+            arc.desdei, arc.desded, arc.hastai, arc.hastad,
+            arc.mzai, arc.mzad,
+            arc.codloc20, arc.nomencla10,
+            arc.nomenclai, arc.nomenclad,
             arc.wkb_geometry,
+   ---------------------------------
             'e0359'::text AS cover,
-            arc.segi,
-            arc.segd
+   ---------------------------------
+            arc.segi, arc.segd
+   ---------------------------------
            FROM e0359.arc
-        ), lados_de_manzana AS (
+   ---------------------------------
+        ),
+  lados_de_manzana AS (
          SELECT e00.codigo20,
             (e00.mzai::text || '-'::text) || e00.ladoi AS lado_id,
-            e00.mzai AS mza,
-            e00.ladoi AS lado,
+            e00.mzai AS mza, e00.ladoi AS lado,
             avg(e00.anchomed) AS anchomed,
             st_linemerge(st_union(st_reverse(e00.wkb_geometry))) AS geom,
             e00.cover,
@@ -76,8 +68,7 @@ fecha: Oct/Nov 2019
         UNION
          SELECT e00.codigo20,
             (e00.mzad::text || '-'::text) || e00.ladod AS lado_id,
-            e00.mzad AS mza,
-            e00.ladod AS lado,
+            e00.mzad AS mza, e00.ladod AS lado,
             avg(e00.anchomed) AS anchomed,
             st_linemerge(st_union(e00.wkb_geometry)) AS geom,
             e00.cover,
@@ -85,17 +76,21 @@ fecha: Oct/Nov 2019
            FROM e00
           WHERE e00.mzad IS NOT NULL AND e00.mzad::text <> ''::text
           GROUP BY e00.codigo20, e00.mzad, e00.ladod, e00.cover, e00.segd
-        ), lados_codigos AS (
+        ), 
+  lados_codigos AS (
          SELECT lados_de_manzana.codigo20,
             lados_de_manzana.lado_id,
-            lados_de_manzana.mza,
-            lados_de_manzana.lado,
+            lados_de_manzana.mza, lados_de_manzana.lado,
             lados_de_manzana.seg,
             st_simplifyvw(st_linemerge(st_union(lados_de_manzana.geom)), 10::double precision) AS geom,
             lados_de_manzana.cover
            FROM lados_de_manzana
-          GROUP BY lados_de_manzana.codigo20, lados_de_manzana.lado_id, lados_de_manzana.mza, lados_de_manzana.lado, lados_de_manzana.cover, lados_de_manzana.seg
-        ), lado_manzana AS (
+          GROUP BY lados_de_manzana.codigo20, 
+           lados_de_manzana.lado_id, 
+           lados_de_manzana.mza, lados_de_manzana.lado, 
+           lados_de_manzana.cover, lados_de_manzana.seg
+        ), 
+  lado_manzana AS (
          SELECT "substring"(lados_codigos.mza::text, 1, 2)::integer AS prov,
             "substring"(lados_codigos.mza::text, 3, 3)::integer AS depto,
             "substring"(lados_codigos.mza::text, 6, 3)::integer AS codloc,
@@ -108,16 +103,30 @@ fecha: Oct/Nov 2019
             lados_codigos.mza AS link,
             lados_codigos.lado,
             lados_codigos.seg,
-            st_buffer(st_offsetcurve(st_linesubstring(lados_codigos.geom, 0.10::double precision, 0.90::double precision), '-6'::integer::double precision), 4::double precision, 'endcap=flat join=round'::text) AS geom,
-                CASE
-                    WHEN st_geometrytype(lados_codigos.geom) <> 'ST_LineString'::text THEN 'Lado discontinuo'::text
-                    ELSE NULL::text
-                END AS error_msg,
+            st_buffer(
+              st_offsetcurve(
+                st_linesubstring(
+                      lados_codigos.geom, 0.10::double precision, 0.90::double precision
+                  ), 
+                '-6'::integer::double precision
+                ), 
+              4::double precision, 'endcap=flat join=round'::text
+            ) AS geom,
+            CASE
+              WHEN st_geometrytype(lados_codigos.geom) <> 'ST_LineString'::text THEN 'Lado discontinuo'::text
+              ELSE NULL::text
+            END AS error_msg,
             row_number() OVER w AS ranking
            FROM lados_codigos
-          WINDOW w AS (PARTITION BY lados_codigos.mza ORDER BY (st_y(st_startpoint(lados_codigos.geom))) DESC, (st_x(st_startpoint(lados_codigos.geom))))
+          WINDOW w AS (
+            PARTITION 
+              BY lados_codigos.mza 
+              ORDER BY (st_y(st_startpoint(lados_codigos.geom))) 
+              DESC, (st_x(st_startpoint(lados_codigos.geom)))
+            )
           ORDER BY ("substring"(lados_codigos.mza::text, 13, 3)::integer), lados_codigos.lado
-        ), final AS (
+        ), 
+  final AS (
          SELECT (((((((((lado_manzana.prov || '-'::text) || lado_manzana.depto) || '-'::text) || lado_manzana.codloc) || '-'::text) || lado_manzana.frac) || '-'::text) || lado_manzana.radio) || '-'::text) || lado_manzana.seg AS gid,
             lado_manzana.prov,
             lado_manzana.depto,
