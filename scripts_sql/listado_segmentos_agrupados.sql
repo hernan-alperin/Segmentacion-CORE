@@ -121,14 +121,30 @@ fecha: Oct/Nov 2019
           WINDOW w AS (
             PARTITION 
               BY lados_codigos.mza 
-              ORDER BY (st_y(st_startpoint(lados_codigos.geom))) 
-              DESC, (st_x(st_startpoint(lados_codigos.geom)))
+              ORDER BY (st_y(st_startpoint(lados_codigos.geom))) DESC, 
+                       (st_x(st_startpoint(lados_codigos.geom)))
             )
-          ORDER BY ("substring"(lados_codigos.mza::text, 13, 3)::integer), lados_codigos.lado
+          ORDER BY ("substring"(lados_codigos.mza::text, 13, 3)::integer), 
+                   lados_codigos.lado
         ), 
   final AS (
-         SELECT (((((((((lado_manzana.prov || '-'::text) || lado_manzana.depto) || '-'::text) || lado_manzana.codloc) || '-'::text) || lado_manzana.frac) || '-'::text) || lado_manzana.radio) || '-'::text) || lado_manzana.seg AS gid,
-            lado_manzana.prov,
+         SELECT (
+           (
+             (
+               (
+                 (
+                   (
+                     (
+                       (
+                         (lado_manzana.prov || '-'::text) 
+                           || lado_manzana.depto
+                       ) || '-'::text
+                     ) || lado_manzana.codloc
+                   ) || '-'::text
+                 ) || lado_manzana.frac) || '-'::text
+             ) || lado_manzana.radio) || '-'::text
+         ) || lado_manzana.seg AS gid,
+            lado_manzana.prov, 
             lado_manzana.depto,
             lado_manzana.codloc,
             lado_manzana.frac,
@@ -141,16 +157,21 @@ fecha: Oct/Nov 2019
             '*' AS final,
             st_union(lado_manzana.geom) AS geom
            FROM lado_manzana
-             LEFT JOIN segmentacion.conteos conteos(tabla, prov, depto, codloc, frac, radio, mza, lado, conteo, id) USING (prov, depto, codloc, frac, radio, mza, lado)
+             LEFT JOIN 
+    ---------------------- usa a drepecar segmentacion.conteos
+             segmentacion.conteos conteos(tabla, prov, depto, codloc, frac, radio, mza, lado, conteo, id) 
+             USING (prov, depto, codloc, frac, radio, mza, lado)
           WHERE lado_manzana.seg <> 0
           GROUP BY ((((((((((lado_manzana.prov || '-'::text) || lado_manzana.depto) || '-'::text) || lado_manzana.codloc) || '-'::text) || lado_manzana.frac) || '-'::text) || lado_manzana.radio) || '-'::text) || lado_manzana.seg), lado_manzana.prov, lado_manzana.depto, lado_manzana.codloc, lado_manzana.frac, lado_manzana.radio, lado_manzana.codaglo, lado_manzana.seg, lado_manzana.mza, lado_manzana.lado
           ORDER BY ((((((((((lado_manzana.prov || '-'::text) || lado_manzana.depto) || '-'::text) || lado_manzana.codloc) || '-'::text) || lado_manzana.frac) || '-'::text) || lado_manzana.radio) || '-'::text) || lado_manzana.seg), lado_manzana.prov, lado_manzana.depto, lado_manzana.codloc, lado_manzana.frac, lado_manzana.radio, lado_manzana.codaglo, lado_manzana.seg, lado_manzana.mza, lado_manzana.lado
         ), mi_tabla AS (
          SELECT lpad(final.prov::text, 2, '0'::text)::character(2) AS prov,
+  ------------------------- stuff local...        
             '0357'::character(4) AS codmuni,
             'MU'::character(2) AS catmuni,
             final.codaglo,
             '03'::character(2) AS nroentidad,
+  -------------------------
             lpad(final.depto::text, 3, '0'::text)::character(3) AS depto,
             lpad(final.codloc::text, 3, '0'::text)::character(3) AS codloc,
             lpad(final.frac::text, 2, '0'::text)::character(2) AS frac,
