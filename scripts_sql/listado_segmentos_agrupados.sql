@@ -164,7 +164,8 @@ fecha: Oct/Nov 2019
           WHERE lado_manzana.seg <> 0
           GROUP BY ((((((((((lado_manzana.prov || '-'::text) || lado_manzana.depto) || '-'::text) || lado_manzana.codloc) || '-'::text) || lado_manzana.frac) || '-'::text) || lado_manzana.radio) || '-'::text) || lado_manzana.seg), lado_manzana.prov, lado_manzana.depto, lado_manzana.codloc, lado_manzana.frac, lado_manzana.radio, lado_manzana.codaglo, lado_manzana.seg, lado_manzana.mza, lado_manzana.lado
           ORDER BY ((((((((((lado_manzana.prov || '-'::text) || lado_manzana.depto) || '-'::text) || lado_manzana.codloc) || '-'::text) || lado_manzana.frac) || '-'::text) || lado_manzana.radio) || '-'::text) || lado_manzana.seg), lado_manzana.prov, lado_manzana.depto, lado_manzana.codloc, lado_manzana.frac, lado_manzana.radio, lado_manzana.codaglo, lado_manzana.seg, lado_manzana.mza, lado_manzana.lado
-        ), mi_tabla AS (
+        ), 
+    mi_tabla AS (
          SELECT lpad(final.prov::text, 2, '0'::text)::character(2) AS prov,
   ------------------------- stuff local...        
             '0357'::character(4) AS codmuni,
@@ -204,5 +205,8 @@ fecha: Oct/Nov 2019
     sum(mi_tabla.vivseg) AS vivs,
     mi_tabla.final
    FROM mi_tabla
-  GROUP BY mi_tabla.prov, mi_tabla.codmuni, mi_tabla.catmuni, mi_tabla.depto, mi_tabla.frac, mi_tabla.radio, mi_tabla.tiporad, mi_tabla.codloc, mi_tabla.nroentidad, mi_tabla.codaglo, mi_tabla.tipoform, mi_tabla.seg, mi_tabla.ve_cc_bc_ca, mi_tabla.rural, mi_tabla.final;
+  GROUP BY mi_tabla.prov, mi_tabla.codmuni, mi_tabla.catmuni, mi_tabla.depto, 
+    mi_tabla.frac, mi_tabla.radio, mi_tabla.tiporad, 
+    mi_tabla.codloc, mi_tabla.nroentidad, mi_tabla.codaglo, 
+    mi_tabla.tipoform, mi_tabla.seg, mi_tabla.ve_cc_bc_ca, mi_tabla.rural, mi_tabla.final;
 
