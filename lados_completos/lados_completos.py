@@ -513,8 +513,8 @@ import getpass
 user = getpass.getuser()
 user_host = user + '@' + host
 comando = " ".join(sys.argv[:])
-#print('[' + user_host + ']$ python ' + pwd + '/' + comando)
-#print(":".join(dao.conn_info))
+print('[' + user_host + ']$ python ' + pwd + '/' + comando)
+print(":".join(dao.conn_info))
 import datetime
 
 dao.set_corrida(comando, user_host, pwd, prov, dpto, frac, radio, datetime.datetime.now())
