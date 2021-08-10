@@ -165,7 +165,7 @@ select prov::integer, dpto::integer, codloc::integer, frac::integer, radio::inte
    lpad(mza::integer::text, 3, ''0''),
     case when indec.manzana_completa_ffrr(''' || esquema || '''::text, frac::integer, radio::integer, mza::integer)
          then '' completa''
-         else '': '', descripcion
+         else concat('': '', descripcion)
     end
     ), ''. '' order by mza),
   indec.excluye_colectivas(''' || esquema || ''', segmento_id)) as descripcion,
