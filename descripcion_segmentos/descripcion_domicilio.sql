@@ -63,7 +63,7 @@ END IF;
 execute '
 select
   ''' || subtipo || '''  || '' en '' || 
-  ccalle::integer::text || '' - '' || ncalle ||
+  trim(leading ''0'' from ccalle) || '' - '' || ncalle ||
     case
     when nrocatastr is Null or trim(nrocatastr) = '''' or
          trim(nrocatastr) = ''0'' or trim(nrocatastr) = ''S/N''
@@ -108,7 +108,7 @@ declare domicilio text;
 begin
 execute '
 select
-  ccalle::integer::text || '' - '' || ncalle || 
+  trim(leading ''0'' from ccalle) || '' - '' || ncalle || 
     case
     when nrocatastr is Null or trim(nrocatastr) = '''' or 
          trim(nrocatastr) = ''0'' or trim(nrocatastr) = ''S/N'' 
@@ -156,7 +156,7 @@ declare
     hasta text;
 begin
 execute '
-select ccalle::integer::text || '' - '' || ncalle 
+select trim(leading ''0'' from ccalle) || '' - '' || ncalle 
 from "' || esquema || '".listado
 where listado.id  = ' || desde_id || '
 ;' into calle;
@@ -167,7 +167,7 @@ end if;
 
 execute '
 select
---  ccalle::integer::text || '' - '' || ncalle || '' '' || -- la calle es la misma 
+--  trim(leading ''0'' from ccalle) || '' - '' || ncalle || '' '' || -- la calle es la misma 
     nrocatastr ||
   case
     when edificio is Null or edificio = '''' then ''''
@@ -195,7 +195,7 @@ where listado.id  = ' || desde_id || '
 
 execute '
 select
---  ccalle::integer::text || '' - '' || ncalle || '' '' ||  -- la calle es la misma
+--  trim(leading ''0'' from ccalle) || '' - '' || ncalle || '' '' ||  -- la calle es la misma
     nrocatastr ||
   case
     when edificio is Null or edificio = '''' then ''''
