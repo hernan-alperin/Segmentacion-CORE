@@ -63,7 +63,7 @@ END IF;
 execute '
 select
   ''' || subtipo || '''  || '' en '' ||
-  ''manzana '' || mza || '' lado '' ||  lado || '': '' ||
+  ''Manzana '' || mza || '' Lado '' ||  lado || '': '' ||
   trim(leading ''0'' from ccalle) || '' - '' || ncalle ||
     case
     when nrocatastr is Null or trim(nrocatastr) = '''' or
