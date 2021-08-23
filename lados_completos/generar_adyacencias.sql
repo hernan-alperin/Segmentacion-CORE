@@ -115,9 +115,11 @@ lado_de_enfrente as (
         a.arc_tipo, a.arc_codigo
     from lados_de_manzana i
     join lados_de_manzana j
-    on i.nodo_j_geom = j.nodo_i_geom -- el lado_i termina donde el lado_j empieza
+    on i.codigos = j.codigos -- mismo eje
+------------------------------------- relajamos condición de enfrente. no hace falta cruzar por la esquina
+    and i.nodo_j_geom = j.nodo_i_geom -- el lado_i termina donde el lado_j empieza
     -- los lados van de nodo_i a nodo_j
-    and i.codigos = j.codigos -- mismo eje
+----------------------------------------------------------------------------------------------------------
     join manzanas_adyacentes a
     on i.ppdddlllffrrmmm = a.mza_i and j.ppdddlllffrrmmm = a.mza_j -- las manzanas son adyacentes
     and a.arc_codigo = any(j.codigos) -- mismo eje
