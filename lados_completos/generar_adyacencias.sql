@@ -132,7 +132,7 @@ mza_enfrente as (
     join lados_de_manzana j
     on i.codigos = j.codigos -- mismo eje
 ------------------------------------- relajamos condición de enfrente. no cruza por la esquina
-    and i.nodo_j_geom i != j.nodo_i_geom -- el lado_i no termina donde el lado_j empieza
+    and not (i.nodo_j_geom = j.nodo_i_geom) -- el lado_i no termina donde el lado_j empieza
 ----------------------------------------------------------------------------------------------------------
     join manzanas_adyacentes a
     on i.ppdddlllffrrmmm = a.mza_i and j.ppdddlllffrrmmm = a.mza_j -- las manzanas son adyacentes
