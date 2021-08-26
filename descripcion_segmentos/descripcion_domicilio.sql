@@ -63,7 +63,7 @@ END IF;
 execute '
 select
   ''' || subtipo || '''  || '' en '' ||
-  ''Manzana '' || mza || '' Lado '' ||  lado || '': '' ||
+  ''Manzana '' || mza || '' Lado '' || lpad(lado::integer::text,2,''0'') || '': '' ||
   trim(leading ''0'' from ccalle) || '' - '' || ncalle ||
     case
     when nrocatastr is Null or trim(nrocatastr) = '''' or

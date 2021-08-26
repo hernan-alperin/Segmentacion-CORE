@@ -20,10 +20,11 @@ create or replace function indec.describe_sin_muestreo_ffrr(esquema text, _frac 
  language plpgsql volatile
 set client_min_messages = error
 as $function$
+declare sql text;
+
 begin
 
-return query
-execute '
+sql = '
 with
   listado as ( select id, prov, dpto, codloc, frac, radio, mza, lado,
     coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco,
@@ -157,6 +158,13 @@ segmentos_descripcion_mza as (
   natural join lados_ordenados
   group by prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
     mza::integer, segmento_id::bigint
+  ),
+hay_colectivas as (
+  select prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer
+  from listado
+  where tipoviv = ''CO''
+  group by prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer
+  limit 1
   )
 
 select prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
@@ -175,9 +183,18 @@ join etiquetas
 using (segmento_id)
 group by prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
   segmento_id::bigint, seg::integer, seg::text
-order by seg::integer
-
+union
+select
+   prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
+   Null::bigint, ''90'' as seg, ''viviendas colectivas'' as descripcion, Null as viviendas
+from hay_colectivas
+order by seg
 ;';
+
+
+return query 
+execute sql;
+
 end;
 $function$
 ;
