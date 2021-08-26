@@ -133,8 +133,8 @@ mza_enfrente as (
     on i.codigos = j.codigos -- mismo eje
 ------------------------------------- relajamos condición de enfrente. no cruza por la esquina
     and not (i.nodo_j_geom = j.nodo_i_geom) -- el lado_i no termina donde el lado_j empieza
-----------------------------------------------------------------------------------------------------------
     -- los lados van de nodo_i a nodo_j
+----------------------------------------------------------------------------------------------------------
     join manzanas_adyacentes a
     on i.ppdddlllffrrmmm = a.mza_i and j.ppdddlllffrrmmm = a.mza_j -- las manzanas son adyacentes
     and a.arc_codigo = any(j.codigos) -- mismo eje
