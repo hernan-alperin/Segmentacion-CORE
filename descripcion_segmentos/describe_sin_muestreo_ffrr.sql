@@ -186,7 +186,7 @@ group by prov::integer, dpto::integer, codloc::integer, frac::integer, radio::in
 union
 select
    prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
-   Null::bigint, ''90'' as seg, ''viviendas colectivas'' as descripcion, Null as viviendas
+   Null::bigint, ''90'' as seg, ''Viviendas colectivas'' as descripcion, Null as viviendas
 from hay_colectivas
 order by seg
 ;';
