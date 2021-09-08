@@ -139,3 +139,6 @@ data/
 notas.sql
 
 #the local changes of this file
+
+#archivos de prueba
+foo.sql
