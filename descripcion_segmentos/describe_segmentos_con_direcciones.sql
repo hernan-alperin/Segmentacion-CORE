@@ -42,15 +42,18 @@ as $function$
 begin
 
 execute '
+begin;
+
 delete from "' || esquema || '".r3
 where frac::integer = ' || _frac || ' and radio::integer = ' || _radio || '
-;';
+;
 
-execute '
 insert into "' || esquema || '".r3
 select *
 from indec.describe_segmentos_con_direcciones_ffrr(''' || esquema || ''', ' || _frac || ', ' || _radio || ')
-;';
+;
+
+commit,';
 
 return 1;
 
