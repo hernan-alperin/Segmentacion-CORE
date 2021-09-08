@@ -53,7 +53,7 @@ select *
 from indec.describe_segmentos_con_direcciones_ffrr(''' || esquema || ''', ' || _frac || ', ' || _radio || ')
 ;
 
-commit,';
+commit;';
 
 return 1;
 
