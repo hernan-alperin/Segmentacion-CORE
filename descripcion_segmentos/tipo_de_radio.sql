@@ -42,3 +42,46 @@ $function$
 ;
 
 
+/*
+
+
+with etiquetas as (
+    select generate_series(80,89) as etiqueta
+    )
+select etiqueta, etiqueta - 79 as orden
+from etiquetas
+union
+select etiqueta - 10, etiqueta - 69 as orden
+from etiquetas
+union
+select etiqueta + 11, etiqueta - 59 as orden
+from etiquetas
+where etiqueta + 11 < 100
+order by orden
+;
+
+with radios_mixtos as (
+    select distinct radio.codigo as radio, localidad.codigo as codloc, localidad.nombre
+    from radio
+    join tipo_de_radio
+    on tipo_de_radio_id = tipo_de_radio.id
+    join radio_localidad
+    on radio_id = radio.id
+    join localidad
+    on localidad_id = localidad.id
+    where tipo_de_radio.nombre = 'M'
+    ),
+    multiples as (
+    select radio, count(*)
+    from radios_mixtos
+    group by radio
+    having count(*) > 1
+    )
+select *, rank() over (partition by radio order by codloc)
+from radios_mixtos
+natural join multiples
+order by count desc, radio, codloc
+;
+
+
+*/
