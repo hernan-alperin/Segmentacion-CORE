@@ -1,5 +1,3 @@
-/*
-titulo: tipo_de_radio.sql
 descripción:
 devuelve 'U', 'R' o 'M' si el radio es urbano, rural o mixto respect.
 autor: -h
@@ -42,6 +40,19 @@ $function$
 ;
 
 
+DROP FUNCTION if exists indec.etiqueta(text, integer, integer, integer);
+create or replace function indec.etiqueta(esquema text, _frac integer, _radio integer, _rank integer)
+ returns char(2)
+ language plpgsql volatile
+set client_min_messages = error
+as $function$
+
+declare 
+loc_rank integer;
+etiqueta char(2);
+
+begin
+
 /*
 
 
@@ -60,7 +71,15 @@ where etiqueta + 11 < 100
 order by orden
 ;
 
-with radios_mixtos as (
+
+*/
+
+execute '
+with listado as (
+    select distinct prov, dpto, codloc, frac, radio
+    from "' || esquema || '".listado
+  ),
+radios_mixtos as (
     select distinct radio.codigo as radio, localidad.codigo as codloc, localidad.nombre
     from radio
     join tipo_de_radio
@@ -69,7 +88,7 @@ with radios_mixtos as (
     on radio_id = radio.id
     join localidad
     on localidad_id = localidad.id
-    where tipo_de_radio.nombre = 'M'
+    where tipo_de_radio.nombre = ''M''
     ),
     multiples as (
     select radio, count(*)
@@ -77,11 +96,39 @@ with radios_mixtos as (
     group by radio
     having count(*) > 1
     )
-select *, rank() over (partition by radio order by codloc)
-from radios_mixtos
-natural join multiples
-order by count desc, radio, codloc
+radio_localidad_rank as (
+    select radio cod_radio, localidad, rank() over (partition by radio order by codloc)
+    from radios_mixtos
+    natural join multiples
+select rank
+from radio_localidad_rank
+join listado
+on substr(cod_radio,1,2)::integer = prov::integer and substr(cod_radio,3,3)::integer = dpto
+and subtrs(codloc,6,3)::integer = codloc 
+and substr(cod_radio,6,2)::integer = frac and and substr(cod_radio,8,2)::integer = listado.radio
+;' into loc_rank;
+
+if (loc_rank is Null) then
+    etiqueta = lpad(_rank, 2, '0');
+elseif (loc_rank = 1) then
+    etiqueta = (_rank + 80 - 1)::text;
+else if (loc_rank = 2) then
+    etiqueta = (_rank + 70 - 1)::text;
+else if (loc_rank = 3) then
+    etiqueta = (_rank + 90)::text;
+else if (loc_rank = 4) then
+    etiqueta = (_rank + 95)::text;
+else 
+    etiqueta = 'XX'
+end if;
+ 
+return etiqueta;
+
+end;
+$function$
 ;
+
+
 
 
 */
