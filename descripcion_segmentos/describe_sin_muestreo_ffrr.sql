@@ -46,15 +46,6 @@ with
   on listado_id = listado.id
   group by prov, dpto, codloc, frac, radio, segmento_id, mza, lado, orden_reco, sector, edificio, entrada, piso
   ),
-tipo_de_radio as ( 
-  select distinct tipo_de_radio.nombre 
-  from radio 
-  join tipo_de_radio 
-  on tipo_de_radio_id = tipo_de_radio.id 
-  join listado 
-  on substr(radio.codigo,1,2)::integer = listado.prov and substr(radio.codigo,3,3)::integer = listado.dpto 
-  where substr(radio.codigo,6,2)::integer = ' || _frac || ' and substr(radio.codigo,8,2)::integer = ' || _radio || ' 
-  ),
 etiquetas as (
   select segmento_id, rank() over w as seg
   from segmentos_row_number
