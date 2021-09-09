@@ -1,3 +1,5 @@
+/*
+título: tipo_de_radio.sql
 descripción:
 devuelve 'U', 'R' o 'M' si el radio es urbano, rural o mixto respect.
 autor: -h
@@ -48,6 +50,7 @@ set client_min_messages = error
 as $function$
 
 declare 
+loc_count integer;
 loc_rank integer;
 etiqueta char(2);
 
@@ -78,9 +81,11 @@ execute '
 with listado as (
     select distinct prov, dpto, codloc, frac, radio
     from "' || esquema || '".listado
+    where prov != '''' and dpto != '''' and codloc != '''' 
+    and frac::integer = ' || _frac || ' and radio::integer = ' || _radio || '
   ),
 radios_mixtos as (
-    select distinct radio.codigo as radio, localidad.codigo as codloc, localidad.nombre
+    select distinct radio.codigo as cod_radio, localidad.codigo as cod_loc, localidad.nombre
     from radio
     join tipo_de_radio
     on tipo_de_radio_id = tipo_de_radio.id
@@ -90,36 +95,50 @@ radios_mixtos as (
     on localidad_id = localidad.id
     where tipo_de_radio.nombre = ''M''
     ),
-    multiples as (
-    select radio, count(*)
+multiples as (
+    select cod_radio, count(*)
     from radios_mixtos
-    group by radio
-    having count(*) > 1
-    )
+    group by cod_radio
+    ),
 radio_localidad_rank as (
-    select radio cod_radio, localidad, rank() over (partition by radio order by codloc)
+    select cod_radio, cod_loc, 
+    count, rank() over (partition by cod_radio order by cod_loc)
     from radios_mixtos
-    natural join multiples
-select rank
+    join multiples
+    using (cod_radio)
+    )
+select count, rank
 from radio_localidad_rank
-join listado
-on substr(cod_radio,1,2)::integer = prov::integer and substr(cod_radio,3,3)::integer = dpto
-and subtrs(codloc,6,3)::integer = codloc 
-and substr(cod_radio,6,2)::integer = frac and and substr(cod_radio,8,2)::integer = listado.radio
-;' into loc_rank;
+right join listado
+on substr(cod_radio,1,2)::integer = prov::integer and substr(cod_radio,3,3)::integer = dpto::integer
+and substr(cod_loc,6,3)::integer = codloc::integer
+and substr(cod_radio,6,2)::integer = frac::integer and substr(cod_radio,8,2)::integer = listado.radio::integer
+;' into loc_count, loc_rank;
 
 if (loc_rank is Null) then
-    etiqueta = lpad(_rank, 2, '0');
-elseif (loc_rank = 1) then
-    etiqueta = (_rank + 80 - 1)::text;
-else if (loc_rank = 2) then
-    etiqueta = (_rank + 70 - 1)::text;
-else if (loc_rank = 3) then
-    etiqueta = (_rank + 90)::text;
-else if (loc_rank = 4) then
-    etiqueta = (_rank + 95)::text;
+    etiqueta = lpad(_rank::text, 2, '0');
 else 
-    etiqueta = 'XX'
+  if (loc_count = 1) then
+    if (_rank <= 10) then
+      etiqueta = (_rank + 80 - 1)::text;
+    elsif(_rank between 11 and 20) then
+      etiqueta = (_rank + 70 - 11)::text;
+    else 
+      etiqueta = (_rank + 91 - 21)::text;
+    end if;
+  elsif (loc_count > 1) then
+    if (loc_rank = 1) then
+      etiqueta = (_rank + 80 - 1)::text;
+    elsif (loc_rank = 2) then
+      etiqueta = (_rank + 70 - 1)::text;
+    elsif (loc_rank = 3) then
+      etiqueta = (_rank + 90)::text;
+    elsif (loc_rank = 4) then
+      etiqueta = (_rank + 95)::text;
+    else 
+      etiqueta = 'XX';
+    end if;
+  end if;
 end if;
  
 return etiqueta;
@@ -131,4 +150,3 @@ $function$
 
 
 
-*/
