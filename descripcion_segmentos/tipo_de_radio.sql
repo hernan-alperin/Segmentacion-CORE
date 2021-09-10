@@ -126,7 +126,7 @@ else
     elsif (_rank between 21 and 29) then
       etiqueta = (_rank + 91 - 21)::text;
     else
-      etiqueta = 'YY'
+      etiqueta = 'YY';
     end if;
   elsif (loc_count > 1) then
     if (loc_rank = 1) then
