@@ -42,8 +42,8 @@ $function$
 ;
 
 
-DROP FUNCTION if exists indec.etiqueta(text, integer, integer, integer);
-create or replace function indec.etiqueta(esquema text, _frac integer, _radio integer, _rank integer)
+DROP FUNCTION if exists indec.etiqueta(text, integer, integer, bigint);
+create or replace function indec.etiqueta(esquema text, _frac integer, _radio integer, _rank bigint)
  returns char(2)
  language plpgsql volatile
 set client_min_messages = error
@@ -121,10 +121,12 @@ else
   if (loc_count = 1) then
     if (_rank <= 10) then
       etiqueta = (_rank + 80 - 1)::text;
-    elsif(_rank between 11 and 20) then
+    elsif (_rank between 11 and 20) then
       etiqueta = (_rank + 70 - 11)::text;
-    else 
+    elsif (_rank between 21 and 29) then
       etiqueta = (_rank + 91 - 21)::text;
+    else
+      etiqueta = 'YY'
     end if;
   elsif (loc_count > 1) then
     if (loc_rank = 1) then

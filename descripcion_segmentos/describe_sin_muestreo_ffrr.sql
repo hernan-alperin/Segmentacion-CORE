@@ -46,8 +46,8 @@ with
   on listado_id = listado.id
   group by prov, dpto, codloc, frac, radio, segmento_id, mza, lado, orden_reco, sector, edificio, entrada, piso
   ),
-etiquetas as (
-  select segmento_id, rank() over w as seg
+ranks as (
+  select segmento_id, rank() over w as orden
   from segmentos_row_number
   where rnk = 1
   window w as (
@@ -168,7 +168,9 @@ hay_colectivas as (
   )
 
 select prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
-  segmento_id::bigint, lpad(seg::text, 2, ''0'') as seg,
+  segmento_id::bigint, 
+  -- lpad(seg::text, 2, ''0'') as seg,
+  indec.etiqueta(''' || esquema || '''::text, frac::integer, radio::integer, orden)::text as seg,
   concat(string_agg(concat(''Manzana '',
    lpad(mza::integer::text, 3, ''0''),
     case when indec.manzana_completa_ffrr(''' || esquema || '''::text, frac::integer, radio::integer, mza::integer)
@@ -179,10 +181,10 @@ select prov::integer, dpto::integer, codloc::integer, frac::integer, radio::inte
   indec.excluye_colectivas(''' || esquema || ''', segmento_id)) as descripcion,
   sum(viviendas) as viviendas
 from segmentos_descripcion_mza
-join etiquetas 
+join ranks 
 using (segmento_id)
 group by prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
-  segmento_id::bigint, seg::integer, seg::text
+  segmento_id::bigint, indec.etiqueta(''' || esquema || '''::text, frac::integer, radio::integer, orden) 
 union
 select
    prov::integer, dpto::integer, codloc::integer, frac::integer, radio::integer,
