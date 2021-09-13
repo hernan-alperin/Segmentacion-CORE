@@ -114,8 +114,8 @@ cantidad_de_viviendas_deseada_por_segmento = 20
 cantidad_de_viviendas_maxima_deseada_por_segmento = 23
 cantidad_de_viviendas_minima_deseada_por_segmento = 17
 cantidad_de_viviendas_permitida_para_romper_manzana = 5
-multa_fuera_rango_superior = 1
-multa_fuera_rango_inferior = 1
+multa_fuera_rango_superior = 1e3
+multa_fuera_rango_inferior = 1e3
 
 if len(sys.argv) > 7:
     cantidad_de_viviendas_minima_deseada_por_segmento = int(sys.argv[6])
@@ -151,7 +151,7 @@ def costo(segmento):
     else:  # está entre los valores deseados
         # el costo el la diferencia absoluta al valor esperado
         costo = abs(carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
-    return costo + 5*mzas_segmento + 100*costo_adyacencias
+    return costo + 5*mzas_segmento + costo_adyacencias
 
     """
     # otro caso, costo en rango, cuadrático por arriba y lineal por abajo
