@@ -20,7 +20,8 @@ with
     no_se_puede as (
     select array[99900, 99910, 99915, 99920, 99925, 99930, -- ffcc
                  99945, 99946, 99947, 99948, 99949, -- cursos de agua
-                 99970, 99972, 99973 -- canal, embalse, represa
+                 99970, 99972, 99973, -- canal, embalse, represa
+                 99950 -- alambrado
                  ]::integer[] as imposible)
 select
     case 
