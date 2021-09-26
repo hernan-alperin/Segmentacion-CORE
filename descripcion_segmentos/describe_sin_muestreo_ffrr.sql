@@ -47,7 +47,7 @@ with
   group by prov, dpto, codloc, frac, radio, segmento_id, mza, lado, orden_reco, sector, edificio, entrada, piso
   ),
 ranks as (
-  select segmento_id, rank() over w as orden
+  select segmento_id, row_number() over w as orden
   from segmentos_row_number
   where rnk = 1
   window w as (
