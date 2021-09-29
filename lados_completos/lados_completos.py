@@ -406,7 +406,7 @@ for prov, dpto, frac, radio in radios:
                 viviendas[cpte] = int(conteo)
 
             componentes_no_en_adyacencias = list(set(todos_los_componentes) - set(componentes_en_adyacencias))
-            # print ("no están en cobertura", manzanas_no_en_adyacencias)
+            print ("no están en cobertura", componentes_no_en_adyacencias)
             # hay que ponerle nula la lista de adyacencias
             adyacentes = dict()
             for cpte in todos_los_componentes:
