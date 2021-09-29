@@ -52,7 +52,8 @@ ranks as (
   where rnk = 1
   window w as (
     partition by prov, dpto, codloc, frac, radio
-    order by mza, lado, orden_reco, sector, edificio, entrada, piso desc
+    order by mza, lado, orden_reco, sector, edificio, entrada, 
+    REGEXP_REPLACE(COALESCE(piso::character varying, ''0''), ''[^0-9]*'' ,''0'')::integer desc
     )
   ),
 
