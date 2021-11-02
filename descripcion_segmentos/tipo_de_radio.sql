@@ -106,6 +106,7 @@ radio_localidad_rank as (
     from radios_mixtos
     join multiples
     using (cod_radio)
+    where cod_loc != ''000''
     )
 select count, rank
 from radio_localidad_rank
