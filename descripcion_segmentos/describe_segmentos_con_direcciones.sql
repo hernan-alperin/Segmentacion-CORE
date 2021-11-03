@@ -8,6 +8,17 @@ REEMPLAZA A LA ANTERIOR QUE USABA TABLAS INTERMEDIAS segmentos_desde_hasta_ids
 autor: -h
 fecha: 2021-01-29
 
+
+descripción:
+https://github.com/hernan-alperin/Segmentacion-CORE/issues/52
+actualiza r3 del esquema:
+indec.sincro_r3_ffrr(esquema,frac,radio)
+llamando a
+update esquema.r3 con la salida de
+describe_segmentos_con_direcciones_ffrr(esquema, frac, radio)
+autor: -h
+fecha: 2021-11-3
+
 */
 
 DROP FUNCTION if exists indec.describe_segmentos_con_direcciones(text);
