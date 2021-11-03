@@ -76,4 +76,28 @@ $function$
 ;
 
 
+DROP FUNCTION if exists indec.sincro_r3(text);
+create or replace function indec.sincro_r3(esquema text)
+ returns integer
+ language plpgsql volatile
+set client_min_messages = error
+as $function$
+
+declare 
+v_sql_dynamic text;
+row e0211.listado%rowtype;
+
+begin
+v_sql_dynamic := 'select distinct frac, radio from ' || esquema || '.listado;';
+
+for row in execute v_sql_dynamic loop
+  execute 'indec.sincro_r3_ffrr(' || esquema || ', ' || row.frac || ', ' || row.radio || ');';
+end loop;
+
+return 1;
+
+end;
+$function$
+;
+
 
