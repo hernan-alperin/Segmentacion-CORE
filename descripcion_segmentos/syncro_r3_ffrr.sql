@@ -22,17 +22,17 @@ begin
 execute '
 create table if not exists "' || esquema || '".r3 as
 describe_segmentos_con_direcciones_ffrr("' || esquema || '", 0, 0)
-;'
+;';
 
 execute '
 delete from "' || esquema || '".r3
 where frac = ' || frac || ' and radio = ' || radio || '
-;'
+;';
 
 execute '
-inserte into "' || esquema || '".r3
+insert into "' || esquema || '".r3
 select describe_segmentos_con_direcciones_ffrr("' || esquema || '", ' || frac || ', ' || radio || ')
-;'
+;';
 
 return 1;
 end;
