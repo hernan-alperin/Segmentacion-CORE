@@ -55,7 +55,8 @@ begin
 ---- crea la tabla si no existe con una salida nula de describe_segmentos_con_direcciones_ffrr(esquema, frac, radio)
 execute '
 create table if not exists "' || esquema || '".r3 as
-describe_segmentos_con_direcciones_ffrr("' || esquema || '", 0, 0)
+select * 
+from indec.describe_segmentos_con_direcciones_ffrr(''' || esquema || ''', 0, 0)
 ;';
 
 
@@ -85,13 +86,13 @@ as $function$
 
 declare 
 v_sql_dynamic text;
-row e0211.listado%rowtype;
+registro record;
 
 begin
 v_sql_dynamic := 'select distinct frac, radio from ' || esquema || '.listado;';
 
-for row in execute v_sql_dynamic loop
-  execute 'indec.sincro_r3_ffrr(' || esquema || ', ' || row.frac || ', ' || row.radio || ');';
+for registro in execute v_sql_dynamic loop
+  execute 'select indec.sincro_r3_ffrr(''' || esquema || ''', ' || registro.frac::integer || ', ' || registro.radio::integer || ');';
 end loop;
 
 return 1;
