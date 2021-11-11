@@ -40,6 +40,19 @@ class DAO:
         self.cur = self.conn.cursor()
         return 
 
+    def close(self):
+        self.conn.close()
+        return
+
+    def reopen(self):
+        try:
+            self.conn = psycopg2.connect(user=self.user, password=self.passwd,
+                dbname=self.dbname, host=self.host, port=self.port)
+        except psycopg2.Error as e:
+            raise Exception('cannot connect', db_string)
+        self.cur = self.conn.cursor()
+        return
+
     def __str__(self):
         return self.conn_info
 

@@ -334,6 +334,7 @@ for prov, dpto, frac, radio in radios:
         conteos = conteos_mzas
         adyacencias = adyacencias_mzas_mzas
 
+        dao.close()
         print ('Se parten en lados las manzanas con mas de ',
                 cantidad_de_viviendas_permitida_para_romper_manzana,
                 ' viviendas',)
@@ -422,7 +423,7 @@ for prov, dpto, frac, radio in radios:
             soluciones_iniciales = []
             # iniciando de un extremo de la red de segmentaciones: segmento único igual a todo el radio
             todos_juntos = [componentes]
-            soluciones_iniciales.append(todos_juntos)
+#            soluciones_iniciales.append(todos_juntos)
             # iniciando del otro extremo de la red de segmentaciones: un segmento por manzana
             # TODO: probar un segmento x lado
             todos_separados = [[cpte] for cpte in componentes]
@@ -496,12 +497,15 @@ for prov, dpto, frac, radio in radios:
 #------
 # update _table = shapes.eAAAAa  (usando lados)
 #------
+            dao.reopen()
             for cpte in componentes:
                dao.set_componente_segmento(_table, prov, dpto, frac, radio, cpte, segmentos[cpte])
         else:
             print ("sin adyacencias")
 
 # guarda ejecucion
+dao.close()
+dao.reopen()
 import os
 pwd = os.path.dirname(os.path.realpath(__file__))
 import socket
@@ -513,4 +517,4 @@ comando = " ".join(sys.argv[:])
 import datetime
 
 dao.set_corrida(comando, user_host, pwd, prov, dpto, frac, radio, datetime.datetime.now())
-
+dao.close()
