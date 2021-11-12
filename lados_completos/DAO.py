@@ -295,7 +295,7 @@ class DAO:
              + " ('" + str(comando)
              + "', '" + str(user_host)
              + "', '" + str(pwd)
-             + "', '" + str(":".join(self.conn_info))
+             + "', '"
              + "', " + str(prov)
              + " , " + str(dpto)
              + " , " + str(frac)
