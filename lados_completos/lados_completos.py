@@ -516,5 +516,5 @@ user_host = user + '@' + host
 comando = " ".join(sys.argv[:])
 import datetime
 
-dao.set_corrida(comando, user_host, pwd, prov, dpto, frac, radio, datetime.datetime.now())
+dao.set_corrida(comando, user_host, '', prov, dpto, frac, radio, datetime.datetime.now())
 dao.close()
