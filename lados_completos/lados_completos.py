@@ -133,7 +133,7 @@ def costo(segmento):
     adyacencias_segmento = adyacencias_componentes(segmento)
     costo_adyacencias = sum(costo_adyacencia(ady) for ady in adyacencias_segmento if costo_adyacencia(ady))
     if carga_segmento == 0:
-      return 1e9
+      return 10000
     if carga_segmento > cantidad_de_viviendas_maxima_deseada_por_segmento:
         # la carga es mayor el costo es el cubo
         costo = (abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
