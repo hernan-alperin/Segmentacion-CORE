@@ -74,6 +74,12 @@ where etiqueta + 11 < 100
 order by orden
 ;
 
+asigna etiquetas a segmentos de radios mixtos con posibles multilocalidades
+(más de 1 localidad x radio, hay casos de hasta 4 localidades 
+separadas geográficamente dentro de un mismo radio)
+80-89 la 1ra localidad, 70-79 la 2da, 91-95 la 3ra, 96-99 la 4ta
+si es una sola localidad, 80-89 los 1eros 10 segmentos, 70-79 los segundos 10
+desde el 11avo al 20avo, 91-99 los últimos 9
 
 */
 
