@@ -17,7 +17,7 @@ where listado_id = any (' || viviendas || ')
 ';
 get diagnostics cuantas_updated = row_count;
 if not (cuantas_updated = cuantas_viviendas) then
-  RAISE EXCEPTION 'difieren la cantidad de viviendas del array (%) de las que pudo enontrar en esquema.segmentación: %.', cuantas_viviendas, cuantas_updated;
+  RAISE EXCEPTION 'difieren la cantidad de viviendas del array (%) de las que pudo encontrar en esquema.segmentación: %.', cuantas_viviendas, cuantas_updated;
 end if;
 return cuantas_updated;
 END $$ LANGUAGE plpgsql;
