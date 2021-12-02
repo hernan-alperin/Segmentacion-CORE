@@ -8,13 +8,10 @@ RETURNS integer AS $$
 declare cuantas integer;
 begin
 execute '
-with rows as (
-  update ' || esquema || '.segmentacion 
-  set segmento_id = ''' || segmento_id || '''
-  where listado_id = any (' || viviendas || ')
-  returning 1
-  )
-select count(*) from rows' into cuantas;
-
+update ' || esquema || '.segmentacion 
+set segmento_id = ''' || segmento_id || '''
+where listado_id = any (' || viviendas || ')
+';
+get diagnostics cuantas = row_count;
 return cuantas;
 END $$ LANGUAGE plpgsql;
