@@ -10,5 +10,5 @@ CREATE TABLE public.corrida (
     user_host text,
     cuando date
 );
-
+grant select on table public.corrida to geoestadistica_admin;
 
