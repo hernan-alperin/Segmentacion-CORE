@@ -379,7 +379,7 @@ for prov, dpto, frac, radio in radios:
 #        adyacencias = list(set(adyacencias))
 
 #        print (adyacencias)
-        if len(sys.argv) > 11 and sys.argv[11] == 'filtrar':
+        if 'filtrar' in sys.argv:
             adyacencias = [(este, ese) for (este, ese) in adyacencias if este not in lados_excedidos and ese not in lados_excedidos]
             componentes = list(set(componentes) - set(lados_excedidos))
 
@@ -417,7 +417,7 @@ for prov, dpto, frac, radio in radios:
             # soluciones iniciales
             soluciones_iniciales = []
             # iniciando de un extremo de la red de segmentaciones: segmento único igual a todo el radio
-            if 'usar_todos_juntos' in argv:
+            if 'usar_todos_juntos' in sys.argv:
               todos_juntos = [componentes]
               soluciones_iniciales.append(todos_juntos)
               # iniciando del otro extremo de la red de segmentaciones: un segmento por manzana
