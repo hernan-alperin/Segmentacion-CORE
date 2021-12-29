@@ -124,8 +124,6 @@ if len(sys.argv) > 8:
     cantidad_de_viviendas_deseada_por_segmento = int(sys.argv[8])
 if len(sys.argv) > 9:
     cantidad_de_viviendas_permitida_para_romper_manzana = int(sys.argv[9])
-if len(sys.argv) > 10:
-    usar_todos_juntos = (sys.argv[10] == 'usar_todos_juntos')
 
 
 def costo(segmento): 
@@ -424,7 +422,7 @@ for prov, dpto, frac, radio in radios:
             # soluciones iniciales
             soluciones_iniciales = []
             # iniciando de un extremo de la red de segmentaciones: segmento único igual a todo el radio
-            if usar_todos_juntos:
+            if 'usar_todos_juntos' in argv:
               todos_juntos = [componentes]
               soluciones_iniciales.append(todos_juntos)
               # iniciando del otro extremo de la red de segmentaciones: un segmento por manzana
