@@ -282,7 +282,6 @@ import os
 import DAO
 
 dao = DAO.DAO()
-#dao.db('segmentador:rodatnemges:censo2020:172.26.67.239')
 conexion = [
     os.environ.get('MANDARINA_USER', 'alpe'),
     os.environ.get('MANDARINA_PASS', 'alpe'),
@@ -290,11 +289,7 @@ conexion = [
     os.environ.get('MANDARINA_HOST', 'localhost'),
     os.environ.get('MANDARINA_PORT', '5432')
 ]
-#conexion = ["censo2020", "segmentador", "rodatnemges", "172.26.67.239", "5432"]
-if len(sys.argv) > 10:
-    conn_str = sys.argv[10]
-else:
-    conn_str = ':'.join(conexion)
+conn_str = ':'.join(conexion)
 dao.db(conn_str)
 
 radios = dao.get_radios(_table)
