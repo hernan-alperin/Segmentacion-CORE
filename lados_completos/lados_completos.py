@@ -136,22 +136,23 @@ def costo(segmento):
       return 10000
     if carga_segmento > cantidad_de_viviendas_maxima_deseada_por_segmento:
         # la carga es mayor el costo es el cubo
-        costo = (abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
+        costo_vivs = (abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
                 *abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
                 *abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
             + (carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
             + multa_fuera_rango_superior)
     elif carga_segmento < cantidad_de_viviendas_minima_deseada_por_segmento:
         # la carga es menor el costo es el cubo
-        costo = (abs(cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento)
+        costo_vivs = (abs(cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento)
                 *abs(cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento)
                 *abs(cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento)
             + abs(carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
             + multa_fuera_rango_inferior)
     else:  # está entre los valores deseados
         # el costo el la diferencia absoluta al valor esperado
-        costo = abs(carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
-    return costo + 5*mzas_segmento + costo_adyacencias
+        costo_vivs = abs(carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
+    costo_mzas = 5*mzas_segmento*mzas_segmento
+    return costo_vivs + costo_mzas + costo_adyacencias
 
     """
     # otro caso, costo en rango, cuadrático por arriba y lineal por abajo
