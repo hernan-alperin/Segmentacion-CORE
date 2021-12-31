@@ -285,7 +285,7 @@ dao = DAO.DAO()
 conexion = [
     os.environ.get('MANDARINA_USER', 'alpe'),
     os.environ.get('MANDARINA_PASS', 'alpe'),
-    os.environ.get('MANDARINA_DATABASE', 'CPHyV2020'),
+    os.environ.get('MANDARINA_DATABASE', 'alpe'),
     os.environ.get('MANDARINA_HOST', 'localhost'),
     os.environ.get('MANDARINA_PORT', '5432')
 ]
@@ -417,7 +417,7 @@ for prov, dpto, frac, radio in radios:
             # soluciones iniciales
             soluciones_iniciales = []
             # iniciando de un extremo de la red de segmentaciones: segmento único igual a todo el radio
-            if 'usar_todos_juntos' in sys.argv:
+            if 'usar_todos_juntos' in sys.argv and conectados([componentes]):
               todos_juntos = [componentes]
               soluciones_iniciales.append(todos_juntos)
               # iniciando del otro extremo de la red de segmentaciones: un segmento por manzana
