@@ -365,12 +365,6 @@ for prov, dpto, frac, radio in radios:
         adyacencias.extend([((mza, lado), (mza_ady, lado_ady))
                         for (mza, lado), (mza_ady, lado_ady) in lados_contiguos])
 
-########################## poner esto sólo si mza no tiene otra adyacencia
-        adyacencias.extend([(mza, mza_ady)
-                        for (mza, lado), (mza_ady, lado_ady) in mzas_enfrente
-                        if mza not in mzas_excedidas and mza_ady not in mzas_excedidas
-                        and (mza, mza_ady) not in adyacencias])
-###########################################################################################
 
 
         # se agregan los lados correspondientes a esas manzanas
@@ -410,6 +404,14 @@ for prov, dpto, frac, radio in radios:
             for cpte, adyacente in adyacencias:
                 adyacentes[cpte] = adyacentes[cpte] + [adyacente]
                 adyacentes[adyacente] = adyacentes[adyacente] + [cpte]
+
+##########################################################################################
+            adyacencias.extend([(mza, mza_ady)
+                        for (mza, lado), (mza_ady, lado_ady) in mzas_enfrente
+                        if mza not in mzas_excedidas and mza_ady not in mzas_excedidas
+                        and mza in componentes_no_en_adyacencias ### pone esto sólo si mza no tiene otra adyacencia
+                        and (mza, mza_ady) not in adyacencias])
+###########################################################################################
 
             # optimización
 
