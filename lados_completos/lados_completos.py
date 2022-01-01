@@ -115,7 +115,7 @@ cantidad_de_viviendas_maxima_deseada_por_segmento = 23
 cantidad_de_viviendas_minima_deseada_por_segmento = 17
 cantidad_de_viviendas_permitida_para_romper_manzana = 5
 multa_fuera_rango_superior = 1e3
-multa_fuera_rango_inferior = 1e2
+multa_fuera_rango_inferior = 5e2
 
 if len(sys.argv) > 7:
     cantidad_de_viviendas_minima_deseada_por_segmento = int(sys.argv[6])
@@ -133,20 +133,18 @@ def costo(segmento):
     adyacencias_segmento = adyacencias_componentes(segmento)
     costo_adyacencias = sum(costo_adyacencia(ady) for ady in adyacencias_segmento if costo_adyacencia(ady))
     if carga_segmento == 0:
-      return 10000
+      return 1e5
     if carga_segmento > cantidad_de_viviendas_maxima_deseada_por_segmento:
         # la carga es mayor el costo es el cubo
-        costo_vivs = (abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
-                *abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
-                *abs(carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento) 
-            + (carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
+        sobrecarga = carga_segmento - cantidad_de_viviendas_maxima_deseada_por_segmento
+        costo_vivs = (sobrecarga*sobrecarga*sobrecarga
+            + sobrecarga
             + multa_fuera_rango_superior)
     elif carga_segmento < cantidad_de_viviendas_minima_deseada_por_segmento:
+        subcarga = cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento
         # la carga es menor el costo es el cubo
-        costo_vivs = (abs(cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento)
-                *abs(cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento)
-                *abs(cantidad_de_viviendas_minima_deseada_por_segmento - carga_segmento)
-            + abs(carga_segmento - cantidad_de_viviendas_deseada_por_segmento)
+        costo_vivs = (subcarga*subcarga*subcarga
+            + subcarga
             + multa_fuera_rango_inferior)
     else:  # está entre los valores deseados
         # el costo el la diferencia absoluta al valor esperado
@@ -399,6 +397,18 @@ for prov, dpto, frac, radio in radios:
             componentes_no_en_adyacencias = list(set(todos_los_componentes) - set(componentes_en_adyacencias))
             print ("no están en cobertura", componentes_no_en_adyacencias)
             # hay que ponerle nula la lista de adyacencias
+##########################################################################################
+            adyacencias.extend([(mza, mza_ady)
+                        for (mza, lado), (mza_ady, lado_ady) in mzas_enfrente
+                        if mza in componentes_no_en_adyacencias ### pone esto sólo si mza no tiene otra adyacencia
+                        and mza not in mzas_excedidas and mza_ady not in mzas_excedidas
+                        and (mza, mza_ady) not in adyacencias])
+            adyacencias.extend([(mza, (mza_ady, lado_ady))
+                        for (mza, lado), (mza_ady, lado_ady) in mzas_enfrente
+                        if mza in componentes_no_en_adyacencias ### pone esto sólo si mza no tiene otra adyacencia
+                        and mza not in mzas_excedidas
+                        and (mza, (mza_ady, lado_ady)) not in adyacencias])
+###########################################################################################
             adyacentes = dict()
             for cpte in todos_los_componentes:
                 adyacentes[cpte] = list([])
@@ -406,13 +416,6 @@ for prov, dpto, frac, radio in radios:
                 adyacentes[cpte] = adyacentes[cpte] + [adyacente]
                 adyacentes[adyacente] = adyacentes[adyacente] + [cpte]
 
-##########################################################################################
-            adyacencias.extend([(mza, mza_ady)
-                        for (mza, lado), (mza_ady, lado_ady) in mzas_enfrente
-                        if mza in componentes_no_en_adyacencias ### pone esto sólo si mza no tiene otra adyacencia
-                        and mza not in mzas_excedidas and mza_ady not in mzas_excedidas
-                        and (mza, mza_ady) not in adyacencias])
-###########################################################################################
 
             # optimización
 
