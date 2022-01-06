@@ -32,7 +32,7 @@ listado_sin_nulos as (
     coalesce(sector,'''') sector, coalesce(edificio,'''') edificio, coalesce(entrada,'''') entrada,
     coalesce(piso, '''') piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco
     from listado
-    where frac = ' || _frac || ' and ' radio = ' || _radio  || ' 
+    where frac = ' || _frac || ' and radio = ' || _radio  || ' 
     ),
 
 casos as (
