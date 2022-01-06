@@ -6,6 +6,7 @@ cantidad deseada con la proporcional de viviendas por segmento
 usando la cantidad de viviendas en la manzana.
 El objetivo es que los segmentos se aparten lo mínimo de la cantidad deseada
 y que la carga de los censistas esté lo más balanceado
+Lo hace para un solo radio
 autor: -h+M
 fecha: 2022-01-06 Ju
 */
@@ -13,7 +14,7 @@ fecha: 2022-01-06 Ju
 
 
 create or replace function 
-indec.segmentar_equilibrado(aglomerado text, deseado integer)
+indec.segmentar_equilibrado_ffrr(esquema text, _frac integer, _radio integer, deseado integer)
     returns integer
     language plpgsql volatile
     set client_min_messages = error
@@ -25,12 +26,13 @@ execute '
 with 
 parametros as (
     select ' || deseado || '::float as deseado),
-listado as (select * from "' || aglomerado || '".listado),
+listado as (select * from "' || esquema || '".listado),
 listado_sin_nulos as (
     select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr,
     coalesce(sector,'''') sector, coalesce(edificio,'''') edificio, coalesce(entrada,'''') entrada,
     coalesce(piso, '''') piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco
     from listado
+    where frac = ' || _frac || ' and ' radio = ' || _radio  || ' 
     ),
 
 casos as (
@@ -83,7 +85,7 @@ segmento_id_en_mza as (
 segmentos_id as (
     select 
         -- row_number() over (order by dpto, frac, radio, mza, sgm_mza) 
-        nextval(''"' || aglomerado || '".segmentos_seq'')
+        nextval(''"' || esquema || '".segmentos_seq'')
         as segmento_id,
         prov, dpto, codloc, frac, radio, mza, sgm_mza
     from segmento_id_en_mza
@@ -91,7 +93,7 @@ segmentos_id as (
     order by prov, dpto, codloc, frac, radio, mza, sgm_mza
     )
 
-update "' || aglomerado || '".segmentacion sgm
+update "' || esquema || '".segmentacion sgm
 set segmento_id = j.segmento_id
 from (segmentos_id
 join segmento_id_en_mza
@@ -103,3 +105,4 @@ end;
 $function$
 ;
 
+        
