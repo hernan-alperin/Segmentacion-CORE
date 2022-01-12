@@ -130,7 +130,7 @@ def costo(segmento):
   mzas_segmento = cuantas_manzanas(segmento)
   adyacencias_segmento = adyacencias_componentes(segmento)
   costo_adyacencias = sum(costo_adyacencia(ady) for ady in adyacencias_segmento if costo_adyacencia(ady))
-  if 'costo_cuadrático_mzas' in sys.argv:
+  if 'costo_cuadratico_mzas' in sys.argv:
     multa_fuera_rango_superior = 1e3
     multa_fuera_rango_inferior = 5e2
     if carga_segmento == 0:
