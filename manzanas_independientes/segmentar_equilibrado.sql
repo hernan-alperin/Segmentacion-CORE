@@ -1,5 +1,5 @@
 /*
-titulo: segmentar_equilibrado_ffrr.sql
+titulo: segmentar_equilibrado.sql
 descripción: con circuitos definidos por manzanas independientes
 segmenta en forma equilibrada sin cortar piso, balanceando la
 cantidad deseada con la proporcional de viviendas por segmento 
