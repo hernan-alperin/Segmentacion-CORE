@@ -1,5 +1,5 @@
 /*
-busca pisos que estén desordenados
+busca y corrige pisos que estén desordenados
 autor : -h
 2022-01-06
 */
@@ -9,55 +9,39 @@ with listado_sin_nulos as (
     coalesce(sector,'') sector, coalesce(edificio,'') edificio, coalesce(entrada,'') entrada, piso as cpiso,
     case when coalesce(piso, '') = '' or upper(piso) = 'PB' then 0 else piso::integer end piso, dpto_habit,
     coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer orden_reco
-    from e02014010.listado)
-select frac as ff, radio as rr, mza, lado, nrocatastr as nro, 
---sector, edificio, entrada, 
-  i.cpiso as piso, i.orden_reco as orden, 
-  array_agg(j.cpiso order by j.orden_reco) as pisos, array_agg(j.orden_reco order by j.orden_reco) as desordenados
-from listado_sin_nulos i
-join listado_sin_nulos j
-using (prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada)
-where i.piso < j.piso and i.orden_reco <= j.orden_reco
---or i.piso = j.piso and i.dpto_habit > j.dpto_habit and i.orden_reco <= j.orden_reco
-group by frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, i.cpiso, i.orden_reco
-order by frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, i.cpiso desc, i.orden_reco 
-limit 100
+    from e02014010.listado),
+desordenados as (
+    select frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, 
+        i.cpiso as i_piso, i.orden_reco as i_orden, 
+        j.cpiso as j_piso, j.orden_reco as j_orden
+    from listado_sin_nulos i
+    join listado_sin_nulos j
+    using (prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada)
+    where i.piso < j.piso and i.orden_reco <= j.orden_reco),
+i as (
+    select frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, 
+        i_piso, i_orden, min(j_orden) as min_j_orden
+    from desordenados
+    group by frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, 
+        i_piso, i_orden),
+j as (
+    select frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, 
+        j_piso, j_orden
+    from desordenados)    
+select listado.*, 
+    case 
+        when coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer = i_orden then min_j_orden
+        when coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer = j_orden then j_orden + 1
+        else coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer
+    end as orden_reco_corregido
+from e02014010.listado
+natural join i
+natural join j
 ;
 
 
 /*
- ff | rr | mza | lado | nro  | piso | orden |                                         pisos                                         |                                                       desordenados
-----+----+-----+------+------+------+-------+---------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------
- 02 | 02 | 019 | 001  | 1784 | 9    |     1 | {13,13,12,12,11,11,10,10}                                                             | {2,3,4,5,6,7,8,9}
- 02 | 02 | 019 | 002  | 2666 | PB   |    18 | {15,14,13,12,11,10,9,8,7,6,5,4,3,2,1}                                                 | {19,20,21,22,23,24,25,26,27,28,29,30,31,32,33}
- 02 | 02 | 019 | 003  | 2655 | PB   |    56 | {2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1}                                           | {57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77}
- 02 | 06 | 029 | 001  | 2524 | PB   |    11 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 9    |     2 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 8    |     3 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 7    |     4 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 6    |     5 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 5    |     6 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 4    |     7 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 3    |     8 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 2    |     9 | {10}                                                                                  | {12}
- 02 | 06 | 029 | 001  | 2524 | 1    |    10 | {10}                                                                                  | {12}
- 02 | 07 | 035 | 002  | 2394 | PB   |    27 | {7,7,6,6,5,5,4,4,3,3,2,2,1,1}                                                         | {28,29,30,31,32,33,34,35,36,37,38,39,40,41}
- 03 | 05 | 010 | 002  | 1640 | PB   |    14 | {1,1}                                                                                 | {15,16}
- 03 | 05 | 010 | 004  | 1655 |      |     0 | {6,6,5,5,5,4,3,3,2,1}                                                                 | {80,81,82,83,84,85,86,87,88,89}
- 03 | 06 | 011 | 002  | 1732 | PB   |   136 | {10,9,8,7,6,5,4,3,2,1}                                                                | {137,138,139,140,141,142,143,144,145,146}
- 04 | 04 | 010 | 003  | 1927 | 3    |     1 | {6,6,6,5,5,5,5,4,4,4,4}                                                               | {6,7,8,9,10,11,12,13,14,15,16}
- 04 | 07 | 013 | 003  | 1891 |      |   118 | {8,8,8,8,8,7,7,7,5,5,4,4,4,3,3,3,3,2,2,2,2,2,1,1}                                     | {119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142}
- 04 | 10 | 016 | 003  | 1391 | PB   |   179 | {5,4,3,2,1}                                                                           | {180,181,182,183,184}
- 05 | 04 | 003 | 004  | 1707 | PB   |     1 | {9,8,7,6,5,4,3,2,1}                                                                   | {2,3,4,5,6,7,8,9,10}
- 05 | 06 | 009 | 004  | 1633 | PB   |     3 | {11,11,10,10,9,9,8,8,7,7,6,6,5,5,4,4,3,3,2,2,1,1}                                     | {4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}
- 05 | 06 | 009 | 004  | 1653 | PB   |     2 | {11,11,10,10,9,9,8,8,7,7,6,6,5,5,4,4,3,3,2,2,1}                                       | {38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58}
- 05 | 06 | 009 | 004  | 1653 | 1    |     1 | {11,11,10,10,9,9,8,8,7,7,6,6,5,5,4,4,3,3,2,2}                                         | {38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57}
- 06 | 02 | 003 | 001  | 1252 | PB   |   137 | {7,7,7,7,6,6,6,6,5,5,5,5,4,4,4,4,3,3,3,3,2,2,2,2,1,1,1,1}                             | {138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165}
- 06 | 02 | 003 | 003  | 1279 | PB   |   256 | {7,6,6,5,5,4,4,3,3,2,2,1,1}                                                           | {257,258,259,260,261,262,263,264,265,266,267,268,269}
- 06 | 02 | 003 | 003  | 1283 | PB   |   271 | {8,7,6,5,4,3,2,1}                                                                     | {272,273,274,275,276,277,278,279}
- 06 | 02 | 003 | 004  | 1404 | PB   |     1 | {3,2,1}                                                                               | {75,76,77}
- 06 | 03 | 006 | 002  | 1415 | PB   |     1 | {9,8,7,6,5,4,3,2,1}
-...
+ ...
 
 */
 
