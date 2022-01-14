@@ -2,6 +2,7 @@
 busca y corrige pisos que estén desordenados
 autor : -h
 2022-01-13
+esto aún no funciona...
 */
 
 with listado_sin_nulos as (
