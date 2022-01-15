@@ -25,6 +25,17 @@ select distinct frac, radio, mza, lado, nrocatastr_i
 from cruzados
 ;
 
+/*
+busca numeros catastrales no enteros
+autor : -h
+2022-01-14
+*/
+
+select '|' || nrocatastr || '|'
+from e0002.listado
+where not nrocatastr ~ '^[0-9]+$'
+;
+
 
 /*
 busca numeros catastrales que estén pares e impares en el mismo lado
@@ -33,7 +44,8 @@ autor : -h
 */
 
 with listado_sin_nulos as (
-    select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr,
+    select id, prov, dpto, codloc, frac, radio, mza, lado, 
+    coalesce(CASE WHEN orden_reco='' THEN NULL ELSE nrocatastr END,'0') nrocatastr,
     coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer orden_reco
     from e02014010.listado),
 pares_e_impares as (
@@ -47,5 +59,34 @@ from pares_e_impares
 where nrocatastr_i != 0 and nrocatastr_j = 0
 and nrocatastr_i % 2 = 0 and nrocatastr_j % 2 = 1
 ;
+
+/*
+busca numeros catastrales que estén pares creciendo o impares decreciendo
+autor : -h
+2022-01-14
+*/
+
+with listado_sin_nulos as (
+    select id, prov, dpto, codloc, frac, radio, mza, lado,
+    coalesce(CASE WHEN nrocatastr='' THEN NULL ELSE nrocatastr END,'0') nrocatastr,
+    coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer orden_reco
+    from e0002.listado),
+pares_e_impares as (
+    select frac, radio, mza, lado,
+      i.nrocatastr::integer nrocatastr_i, j.nrocatastr::integer nrocatastr_j,
+      i.orden_reco orden_i, j.orden_reco orden_j
+    from listado_sin_nulos i
+    join listado_sin_nulos j 
+    using (prov, dpto, codloc, frac, radio, mza, lado))
+select distinct frac, radio, mza, lado
+from pares_e_impares
+where nrocatastr_i != '0' and nrocatastr_j = '0'
+and (
+  nrocatastr_i % 2 = 0 and nrocatastr_j % 2 = 0 and nrocatastr_i < nrocatastr_j and orden_i < orden_j
+  or 
+  nrocatastr_i % 2 = 1 and nrocatastr_j % 2 = 1 and nrocatastr_i > nrocatastr_j and orden_i < orden_j
+)
+;
+
 
 
