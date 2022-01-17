@@ -47,4 +47,3 @@ order by frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, i.cpiso 
 ...
 
 */
-
