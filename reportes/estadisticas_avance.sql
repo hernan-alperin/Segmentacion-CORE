@@ -54,6 +54,16 @@ from estadisticas
 order by prov
 ;
 
+/*
+-- ver radios segmentados (consulta de Manu)
+select substr(codigo,1,2) prov, count(*) radios, 
+  count(CASE WHEN resultado is not null then 1 else null end) radios_probados 
+from radio 
+GROUP BY 1
+; 
+*/
+
+
 
 /*
 2022-01-17  7:30
