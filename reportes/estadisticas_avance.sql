@@ -34,7 +34,7 @@ estadisticas as (
   from provs_localidades_conteo
   natural full join covers
   natural full join listados
-  natural full join provincias
+--  natural full join provincias
 )
 select prov, provincia, localidades, covers, c1s
 from estadisticas
@@ -80,5 +80,23 @@ UATSEG=> \i estadisticas_avance.sql
 
 PRODSEG=> \i estadisticas_avance.sql
 psql:estadisticas_avance.sql:42: ERROR:  permiso denegado a la tabla provincia
+
+ prov | provincia  | localidades | covers | c1s
+------+------------+-------------+--------+-----
+      | total país |         891 |    889 | 889
+ 10   |            |          30 |     28 |  30
+ 14   |            |         132 |    132 | 132
+ 18   |            |          42 |     42 |  42
+ 34   |            |          18 |     18 |  18
+ 42   |            |          16 |     16 |  16
+ 46   |            |           5 |      5 |   5
+ 50   |            |           9 |      9 |   9
+ 62   |            |          10 |     10 |  10
+ 66   |            |         163 |    163 | 163
+ 74   |            |          15 |     15 |  15
+ 82   |            |         406 |    406 | 404
+ 86   |            |           1 |      1 |   1
+ 90   |            |          44 |     44 |  44
+(14 rows)
 
 */
