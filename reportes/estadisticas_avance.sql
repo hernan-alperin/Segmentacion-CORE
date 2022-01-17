@@ -78,6 +78,7 @@ UATSEG=> \i estadisticas_avance.sql
  94   | Tierra del Fuego                |           6 |      6 |    6
 (25 rows)
 
+psql -h 172.26.68.222 PRODSEG -U halperin
 PRODSEG=> \i estadisticas_avance.sql
 psql:estadisticas_avance.sql:42: ERROR:  permiso denegado a la tabla provincia
 
