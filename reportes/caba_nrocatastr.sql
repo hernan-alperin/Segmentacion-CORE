@@ -8,7 +8,7 @@ demora 45 minutos
 with listado_sin_nulos as (
     select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr,
     coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer orden_reco
-    from e02014010.listado),
+    from e02014010.listado), -- cambiar por e02DDD010
 cruzados as (
     select frac, radio, mza, lado, 
       i.nrocatastr nrocatastr_i, j.nrocatastr nrocatastr_j, k.nrocatastr nrocatastr_k,
@@ -24,6 +24,13 @@ cruzados as (
 select distinct frac, radio, mza, lado, nrocatastr_i
 from cruzados
 ;
+/*
+ frac | radio | mza | lado | nrocatastr_i
+------+-------+-----+------+--------------
+(0 rows)
+
+Time: 2655400.480 ms (44:15.400)
+*/
 
 /*
 busca numeros catastrales no enteros
@@ -32,9 +39,16 @@ autor : -h
 */
 
 select '|' || nrocatastr || '|'
-from e0002.listado
+from e02014010.listado
 where not nrocatastr ~ '^[0-9]+$'
 ;
+/*
+ ?column?
+----------
+(0 rows)
+
+Time: 148.356 ms
+*/
 
 
 /*
@@ -59,6 +73,14 @@ from pares_e_impares
 where nrocatastr_i != 0 and nrocatastr_j = 0
 and nrocatastr_i % 2 = 0 and nrocatastr_j % 2 = 1
 ;
+/*
+ frac | radio | mza | lado
+------+-------+-----+------
+(0 rows)
+
+Time: 308.315 ms
+*/
+
 
 /*
 busca numeros catastrales que estén pares creciendo o impares decreciendo
@@ -70,7 +92,7 @@ with listado_sin_nulos as (
     select id, prov, dpto, codloc, frac, radio, mza, lado,
     coalesce(CASE WHEN nrocatastr='' THEN NULL ELSE nrocatastr END,'0') nrocatastr,
     coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer orden_reco
-    from e0002.listado),
+    from e02014010.listado),
 pares_e_impares as (
     select frac, radio, mza, lado,
       i.nrocatastr::integer nrocatastr_i, j.nrocatastr::integer nrocatastr_j,
@@ -88,5 +110,11 @@ and (
 )
 ;
 
+/*
+ frac | radio | mza | lado
+------+-------+-----+------
+(0 rows)
 
+Time: 253.422 ms
+*/
 
