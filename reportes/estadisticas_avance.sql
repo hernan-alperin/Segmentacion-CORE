@@ -31,12 +31,15 @@ locs2010 as (
   from public.localidad
   group by substr(codigo,1,2)),
 radios2010 as (
-  select substr(codigo,1,2) prov, count(*) radios2010
-  from public.radio
+  select substr(codigo,1,2) prov, 
+    count(case when tipo_de_radio_id = 2 then 1 else Null end) r, 
+    count(case when tipo_de_radio_id = 1 then 1 else Null end) m,
+    count(case when tipo_de_radio_id = 3 then 1 else Null end) u 
+  from radio 
   group by substr(codigo,1,2)),
 estadisticas as (
   select prov, provincia, 
-    localidades, covers, c1s, locs2010, radios2010
+    localidades, covers, c1s, locs2010, m, u
   from provs_localidades_conteo
   natural full join covers
   natural full join listados
@@ -45,11 +48,11 @@ estadisticas as (
   natural full join radios2010
 )
 select prov, provincia, --localidades, covers, c1s, 
-  locs2010, radios2010
+  locs2010, m, u
 from estadisticas
 union
 select '', 'total país', --sum(localidades), sum(covers), sum(c1s), 
-  sum(locs2010), sum(radios2010)
+  sum(locs2010), sum(m), sum(u)
 from estadisticas
 order by prov
 ;
