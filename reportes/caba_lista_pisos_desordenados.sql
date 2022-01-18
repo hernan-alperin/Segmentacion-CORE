@@ -6,14 +6,14 @@ autor : -h
 
 \timing
 
-\o e02014010.pisos_desordenados.txt
+\o e02021010.pisos_desordenados.txt
 
 with listado_sin_nulos as (
     select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr,
     coalesce(sector,'') sector, coalesce(edificio,'') edificio, coalesce(entrada,'') entrada, piso as cpiso,
     case when coalesce(piso, '') = '' or upper(piso) = 'PB' then 0 else piso::integer end piso, dpto_habit,
     coalesce(CASE WHEN orden_reco='' THEN NULL ELSE orden_reco END,'0')::integer orden_reco
-    from e02014010.listado)
+    from e02021010.listado)
 select i.id, frac as ff, radio as rr, mza, lado, nrocatastr as nro, 
 --sector, edificio, entrada, 
   i.cpiso as piso, i.orden_reco as orden, 
