@@ -14,7 +14,7 @@ with hechos_por_dia as (
 select hoy.prov, hoy.hecho, sum(antes.cant)
 from hechos_por_dia hoy
 join hechos_por_dia antes
-on hoy.prov = antes.prov and antes.hecho <= hoy.hecho
+on antes.prov = hoy.prov and antes.hecho <= hoy.hecho
 group by 1,2
 order by 1,2
 ;
