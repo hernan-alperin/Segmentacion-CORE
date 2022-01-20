@@ -23,11 +23,9 @@ listados as (
   from information_schema.tables
   where table_schema similar to 'e[0-9]{8}' and table_name = 'listado'
   group by substr(table_schema,2,2)),
-/*
-provincias as (
-  select codigo prov, nombre provincia
-  from public.provincia),
-*/
+--provincias as (
+--  select codigo prov, nombre provincia
+-- from public.provincia),
 estadisticas as (
   select prov, '' provincia, 
     localidades, covers, c1s
@@ -99,5 +97,59 @@ psql:estadisticas_avance.sql:42: ERROR:  permiso denegado a la tabla provincia
  86   |            |           1 |      1 |   1
  90   |            |          44 |     44 |  44
 (14 rows)
+
+
+Thu Jan 20 06:23:19 -03 2022
+psql -h 10.70.80.82 UATSEG -U halperin
+ prov |            provincia            | localidades | covers | c1s
+------+---------------------------------+-------------+--------+------
+      | total país                      |        1304 |   1282 | 1301
+ 02   | Ciudad Autónoma de Buenos Aires |          15 |      9 |   15
+ 06   | Buenos Aires                    |             |        |
+ 10   | Catamarca                       |         127 |    127 |  127
+ 14   | Córdoba                         |         454 |    453 |  452
+ 18   | Corrientes                      |          43 |     43 |   43
+ 22   | Chaco                           |           2 |      2 |    2
+ 26   | Chubut                          |          47 |     47 |   47
+ 30   | Entre Ríos                      |          61 |     61 |   61
+ 34   | Formosa                         |          83 |     81 |   83
+ 38   | Jujuy                           |          57 |     52 |   56
+ 42   | La Pampa                        |          22 |     22 |   22
+ 46   | La Rioja                        |          17 |     16 |   17
+ 50   | Mendoza                         |          22 |     16 |   22
+ 54   | Misiones                        |          53 |     52 |   53
+ 55   | Sin Nombre                      |             |        |
+ 58   | Neuquén                         |          23 |     23 |   23
+ 62   | Río Negro                       |           9 |      9 |    9
+ 66   | Salta                           |         159 |    159 |  159
+ 70   | San Juan                        |          11 |     11 |   11
+ 74   | San Luis                        |          15 |     15 |   15
+ 78   | Santa Cruz                      |             |        |
+ 82   | Santa Fe                        |           4 |      4 |    4
+ 86   | Santiago del Estero             |           1 |      1 |    1
+ 90   | Tucumán                         |          73 |     73 |   73
+ 94   | Tierra del Fuego                |           6 |      6 |    6
+
+psql -h 172.26.68.222 PRODSEG -U halperin
+ prov | provincia  | localidades | covers | c1s
+------+------------+-------------+--------+------
+      | total país |        1134 |   1132 | 1132
+ 10   |            |          32 |     30 |   32
+ 14   |            |         203 |    203 |  203
+ 18   |            |          73 |     73 |   73
+ 26   |            |          29 |     29 |   29
+ 34   |            |          77 |     77 |   77
+ 42   |            |          22 |     22 |   22
+ 46   |            |           5 |      5 |    5
+ 50   |            |          15 |     15 |   15
+ 62   |            |          11 |     11 |   11
+ 66   |            |         163 |    163 |  163
+ 70   |            |           8 |      8 |    8
+ 74   |            |          15 |     15 |   15
+ 82   |            |         406 |    406 |  404
+ 86   |            |           1 |      1 |    1
+ 90   |            |          70 |     70 |   70
+ 94   |            |           4 |      4 |    4
+(17 rows)
 
 */
