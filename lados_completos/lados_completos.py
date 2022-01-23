@@ -344,7 +344,7 @@ for prov, dpto, frac, radio in radios:
         lados_enfrentados = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady
             in dao.get_adyacencias_lados_enfrentados(_table, prov, dpto, frac, radio)]
 
-        mzas_enfrente = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady 
+        mzas_enfrente = [(mza, (mza_ady, lado_ady)) for mza, mza_ady, lado_ady 
             in dao.get_adyacencias_mzas_enfrente(_table, prov, dpto, frac, radio)]
 
         lados_contiguos = [((mza, lado), (mza_ady, lado_ady)) for mza, lado, mza_ady, lado_ady
@@ -424,12 +424,12 @@ for prov, dpto, frac, radio in radios:
             # hay que ponerle nula la lista de adyacencias
 ##########################################################################################
             adyacencias.extend([(mza, mza_ady)
-                        for (mza, lado), (mza_ady, lado_ady) in mzas_enfrente
+                        for (mza, (mza_ady, lado_ady)) in mzas_enfrente
                         if mza in componentes_no_en_adyacencias ### pone esto sólo si mza no tiene otra adyacencia
                         and mza not in mzas_excedidas and mza_ady not in mzas_excedidas
                         and (mza, mza_ady) not in adyacencias])
             adyacencias.extend([(mza, (mza_ady, lado_ady))
-                        for (mza, lado), (mza_ady, lado_ady) in mzas_enfrente
+                        for (mza, (mza_ady, lado_ady)) in mzas_enfrente
                         if mza in componentes_no_en_adyacencias ### pone esto sólo si mza no tiene otra adyacencia
                         and mza not in mzas_excedidas
                         and (mza, (mza_ady, lado_ady)) not in adyacencias])
