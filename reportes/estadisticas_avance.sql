@@ -23,16 +23,16 @@ listados as (
   from information_schema.tables
   where table_schema similar to 'e[0-9]{8}' and table_name = 'listado'
   group by substr(table_schema,2,2)),
---provincias as (
---  select codigo prov, nombre provincia
--- from public.provincia),
+provincias as (
+  select codigo prov, nombre provincia
+  from public.provincia),
 estadisticas as (
-  select prov, '' provincia, 
+  select prov, provincia, 
     localidades, covers, c1s
   from provs_localidades_conteo
   natural full join covers
   natural full join listados
---  natural full join provincias
+  natural full join provincias
 )
 select prov, provincia, localidades, covers, c1s
 from estadisticas
@@ -177,5 +177,35 @@ psql -h 172.26.68.222 PRODSEG
  90   |            |          80 |     80 |   80
  94   |            |           4 |      4 |    4
 (18 rows)
+
+Mon Jan 24 06:26:08 -03 2022
+ prov |            provincia            | localidades | covers | c1s
+------+---------------------------------+-------------+--------+------
+      | total país                      |        1280 |   1279 | 1278
+ 02   | Ciudad Autónoma de Buenos Aires |             |        |
+ 06   | Buenos Aires                    |             |        |
+ 10   | Catamarca                       |          58 |     57 |   58
+ 14   | Córdoba                         |         209 |    209 |  209
+ 18   | Corrientes                      |          88 |     88 |   88
+ 22   | Chaco                           |          11 |     11 |   11
+ 26   | Chubut                          |          29 |     29 |   29
+ 30   | Entre Ríos                      |             |        |
+ 34   | Formosa                         |          77 |     77 |   77
+ 38   | Jujuy                           |             |        |
+ 42   | La Pampa                        |          28 |     28 |   28
+ 46   | La Rioja                        |           5 |      5 |    5
+ 50   | Mendoza                         |          15 |     15 |   15
+ 54   | Misiones                        |             |        |
+ 58   | Neuquén                         |             |        |
+ 62   | Río Negro                       |          19 |     19 |   19
+ 66   | Salta                           |         163 |    163 |  163
+ 70   | San Juan                        |          39 |     39 |   39
+ 74   | San Luis                        |          48 |     48 |   48
+ 78   | Santa Cruz                      |             |        |
+ 82   | Santa Fe                        |         406 |    406 |  404
+ 86   | Santiago del Estero             |           1 |      1 |    1
+ 90   | Tucumán                         |          80 |     80 |   80
+ 94   | Tierra del Fuego                |           4 |      4 |    4
+(25 rows)
 
 */
