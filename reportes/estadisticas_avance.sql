@@ -45,7 +45,7 @@ order by prov
 
 /*
 2022-01-17  7:30
-psql -h 10.70.80.82 UATSEG -U halperin
+psql -h 10.70.80.82 UATSEG
 UATSEG=> \i estadisticas_avance.sql
  prov |            provincia            | localidades | covers | c1s
 ------+---------------------------------+-------------+--------+------
@@ -76,7 +76,7 @@ UATSEG=> \i estadisticas_avance.sql
  94   | Tierra del Fuego                |           6 |      6 |    6
 (25 rows)
 
-psql -h 172.26.68.222 PRODSEG -U halperin
+psql -h 172.26.68.222 PRODSEG
 PRODSEG=> \i estadisticas_avance.sql
 psql:estadisticas_avance.sql:42: ERROR:  permiso denegado a la tabla provincia
 
@@ -100,7 +100,7 @@ psql:estadisticas_avance.sql:42: ERROR:  permiso denegado a la tabla provincia
 
 
 Thu Jan 20 06:23:19 -03 2022
-psql -h 10.70.80.82 UATSEG -U halperin
+psql -h 10.70.80.82 UATSEG 
  prov |            provincia            | localidades | covers | c1s
 ------+---------------------------------+-------------+--------+------
       | total país                      |        1304 |   1282 | 1301
@@ -130,7 +130,7 @@ psql -h 10.70.80.82 UATSEG -U halperin
  90   | Tucumán                         |          73 |     73 |   73
  94   | Tierra del Fuego                |           6 |      6 |    6
 
-psql -h 172.26.68.222 PRODSEG -U halperin
+psql -h 172.26.68.222 PRODSEG
  prov | provincia  | localidades | covers | c1s
 ------+------------+-------------+--------+------
       | total país |        1134 |   1132 | 1132
@@ -154,7 +154,7 @@ psql -h 172.26.68.222 PRODSEG -U halperin
 
 
 Sat Jan 22 05:03:29 -03 2022
-psql -h 172.26.68.222 PRODSEG -U halperin
+psql -h 172.26.68.222 PRODSEG
 
  prov | provincia  | localidades | covers | c1s
 ------+------------+-------------+--------+------
