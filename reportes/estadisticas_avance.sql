@@ -208,4 +208,34 @@ Mon Jan 24 06:26:08 -03 2022
  94   | Tierra del Fuego                |           4 |      4 |    4
 (25 rows)
 
+Tue Jan 25 07:12:20 -03 2022
+ prov |            provincia            | localidades | covers | c1s
+------+---------------------------------+-------------+--------+------
+      | total país                      |        1311 |   1310 | 1309
+ 02   | Ciudad Autónoma de Buenos Aires |             |        |
+ 06   | Buenos Aires                    |             |        |
+ 10   | Catamarca                       |          58 |     57 |   58
+ 14   | Córdoba                         |         218 |    218 |  218
+ 18   | Corrientes                      |          91 |     91 |   91
+ 22   | Chaco                           |          11 |     11 |   11
+ 26   | Chubut                          |          29 |     29 |   29
+ 30   | Entre Ríos                      |             |        |
+ 34   | Formosa                         |          77 |     77 |   77
+ 38   | Jujuy                           |             |        |
+ 42   | La Pampa                        |          28 |     28 |   28
+ 46   | La Rioja                        |           5 |      5 |    5
+ 50   | Mendoza                         |          15 |     15 |   15
+ 54   | Misiones                        |             |        |
+ 58   | Neuquén                         |             |        |
+ 62   | Río Negro                       |          26 |     26 |   26
+ 66   | Salta                           |         163 |    163 |  163
+ 70   | San Juan                        |          39 |     39 |   39
+ 74   | San Luis                        |          48 |     48 |   48
+ 78   | Santa Cruz                      |             |        |
+ 82   | Santa Fe                        |         406 |    406 |  404
+ 86   | Santiago del Estero             |           1 |      1 |    1
+ 90   | Tucumán                         |          92 |     92 |   92
+ 94   | Tierra del Fuego                |           4 |      4 |    4
+(25 rows)
+
 */
