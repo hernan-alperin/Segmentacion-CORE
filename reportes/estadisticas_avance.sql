@@ -5,13 +5,13 @@ autor: -h
 fecha: 2022-01-17 Lu
 */
 
-with localidades as (
+with esquemas as (
   select schema_name as esquema
   from information_schema.schemata 
   where schema_name similar to 'e[0-9]{8}'),
 provs_localidades_conteo as (
   select substr(esquema,2,2) prov, count(*) as localidades
-  from localidades
+  from esquemas
   group by substr(esquema,2,2)),
 covers as (
   select substr(table_schema,2,2) prov, count(*) as covers
@@ -34,13 +34,23 @@ estadisticas as (
   natural full join listados
   natural full join provincias
 )
-select prov, provincia, localidades, covers, c1s
+select prov, provincia
 from estadisticas
 union
-select '', 'total país', sum(localidades), sum(covers), sum(c1s)
+select '', 'total país', --sum(localidades), sum(covers), sum(c1s)
 from estadisticas
 order by prov
 ;
+
+/*
+-- ver radios segmentados (consulta de Manu)
+select substr(codigo,1,2) prov, count(*) radios, 
+  count(CASE WHEN resultado is not null then 1 else null end) radios_probados 
+from radio 
+GROUP BY 1
+; 
+*/
+
 
 
 /*
@@ -98,6 +108,34 @@ psql:estadisticas_avance.sql:42: ERROR:  permiso denegado a la tabla provincia
  90   |            |          44 |     44 |  44
 (14 rows)
 
+Tue Jan 25 07:09:49 -03 2022
+ prov |            provincia            | locs2010 |  m   |   u
+------+---------------------------------+----------+------+-------
+      | total país                      |     1908 | 1174 | 13639
+ 02   | Ciudad Autónoma de Buenos Aires |          |      |
+ 06   | Buenos Aires                    |          |      |
+ 10   | Catamarca                       |       97 |   42 |   365
+ 14   | Córdoba                         |      241 |  193 |  1438
+ 18   | Corrientes                      |      120 |  137 |  1174
+ 22   | Chaco                           |       39 |   21 |   237
+ 26   | Chubut                          |       78 |   28 |   847
+ 30   | Entre Ríos                      |          |      |
+ 34   | Formosa                         |       98 |   83 |   700
+ 38   | Jujuy                           |          |      |
+ 42   | La Pampa                        |       39 |   19 |   295
+ 46   | La Rioja                        |       89 |   25 |   442
+ 50   | Mendoza                         |       19 |   27 |    91
+ 54   | Misiones                        |          |      |
+ 58   | Neuquén                         |          |      |
+ 62   | Río Negro                       |       40 |   16 |   216
+ 66   | Salta                           |      186 |  128 |  1412
+ 70   | San Juan                        |       46 |   37 |    87
+ 74   | San Luis                        |       52 |   31 |   403
+ 78   | Santa Cruz                      |          |      |
+ 82   | Santa Fe                        |      433 |  230 |  4699
+ 86   | Santiago del Estero             |      192 |  102 |   589
+ 90   | Tucumán                         |      128 |   47 |   430
+ 94   | Tierra del Fuego                |       11 |    8 |   214
 
 Thu Jan 20 06:23:19 -03 2022
 psql -h 10.70.80.82 UATSEG 
