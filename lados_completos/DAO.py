@@ -229,10 +229,10 @@ class DAO:
 
 
     def get_adyacencias_mzas_enfrente(self, region, prov, dpto, frac, radio):
-        sql = ('select substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
+        sql = ('select distinct substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer, lado_j from "' + region + '".lados_adyacentes'
             + self.sql_where_PPDDDLLLFFRR(prov, dpto, frac, radio)
             + "\n and mza_i != mza_j and tipo = 'mza_enfrente'"
-            + "\norder by substr(mza_i,13,3)::integer, lado_i, substr(mza_j,13,3)::integer, lado_j;\n"
+            + "\norder by substr(mza_i,13,3)::integer, substr(mza_j,13,3)::integer, lado_j;\n"
             )
         try:
             self.cur.execute(sql)

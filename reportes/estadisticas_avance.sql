@@ -26,33 +26,18 @@ listados as (
 provincias as (
   select codigo prov, nombre provincia
   from public.provincia),
-locs2010 as (
-  select substr(codigo,1,2) prov, count(*) locs2010
-  from public.localidad
-  group by substr(codigo,1,2)),
-radios2010 as (
-  select substr(codigo,1,2) prov, 
-    count(case when tipo_de_radio_id = 2 then 1 else Null end) r, 
-    count(case when tipo_de_radio_id = 1 then 1 else Null end) m,
-    count(case when tipo_de_radio_id = 3 then 1 else Null end) u 
-  from radio 
-  group by substr(codigo,1,2)),
 estadisticas as (
   select prov, provincia, 
-    localidades, covers, c1s, locs2010, m, u
+    localidades, covers, c1s
   from provs_localidades_conteo
   natural full join covers
   natural full join listados
   natural full join provincias
-  natural full join locs2010
-  natural full join radios2010
 )
-select prov, provincia, --localidades, covers, c1s, 
-  locs2010, m, u
+select prov, provincia
 from estadisticas
 union
-select '', 'total país', --sum(localidades), sum(covers), sum(c1s), 
-  sum(locs2010), sum(m), sum(u)
+select '', 'total país', --sum(localidades), sum(covers), sum(c1s)
 from estadisticas
 order by prov
 ;
@@ -70,7 +55,7 @@ GROUP BY 1
 
 /*
 2022-01-17  7:30
-psql -h 10.70.80.82 UATSEG -U halperin
+psql -h 10.70.80.82 UATSEG
 UATSEG=> \i estadisticas_avance.sql
  prov |            provincia            | localidades | covers | c1s
 ------+---------------------------------+-------------+--------+------
@@ -101,7 +86,7 @@ UATSEG=> \i estadisticas_avance.sql
  94   | Tierra del Fuego                |           6 |      6 |    6
 (25 rows)
 
-psql -h 172.26.68.222 PRODSEG -U halperin
+psql -h 172.26.68.222 PRODSEG
 PRODSEG=> \i estadisticas_avance.sql
 psql:estadisticas_avance.sql:42: ERROR:  permiso denegado a la tabla provincia
 
@@ -151,6 +136,144 @@ Tue Jan 25 07:09:49 -03 2022
  86   | Santiago del Estero             |      192 |  102 |   589
  90   | Tucumán                         |      128 |   47 |   430
  94   | Tierra del Fuego                |       11 |    8 |   214
+
+Thu Jan 20 06:23:19 -03 2022
+psql -h 10.70.80.82 UATSEG 
+ prov |            provincia            | localidades | covers | c1s
+------+---------------------------------+-------------+--------+------
+      | total país                      |        1304 |   1282 | 1301
+ 02   | Ciudad Autónoma de Buenos Aires |          15 |      9 |   15
+ 06   | Buenos Aires                    |             |        |
+ 10   | Catamarca                       |         127 |    127 |  127
+ 14   | Córdoba                         |         454 |    453 |  452
+ 18   | Corrientes                      |          43 |     43 |   43
+ 22   | Chaco                           |           2 |      2 |    2
+ 26   | Chubut                          |          47 |     47 |   47
+ 30   | Entre Ríos                      |          61 |     61 |   61
+ 34   | Formosa                         |          83 |     81 |   83
+ 38   | Jujuy                           |          57 |     52 |   56
+ 42   | La Pampa                        |          22 |     22 |   22
+ 46   | La Rioja                        |          17 |     16 |   17
+ 50   | Mendoza                         |          22 |     16 |   22
+ 54   | Misiones                        |          53 |     52 |   53
+ 55   | Sin Nombre                      |             |        |
+ 58   | Neuquén                         |          23 |     23 |   23
+ 62   | Río Negro                       |           9 |      9 |    9
+ 66   | Salta                           |         159 |    159 |  159
+ 70   | San Juan                        |          11 |     11 |   11
+ 74   | San Luis                        |          15 |     15 |   15
+ 78   | Santa Cruz                      |             |        |
+ 82   | Santa Fe                        |           4 |      4 |    4
+ 86   | Santiago del Estero             |           1 |      1 |    1
+ 90   | Tucumán                         |          73 |     73 |   73
+ 94   | Tierra del Fuego                |           6 |      6 |    6
+
+psql -h 172.26.68.222 PRODSEG
+ prov | provincia  | localidades | covers | c1s
+------+------------+-------------+--------+------
+      | total país |        1134 |   1132 | 1132
+ 10   |            |          32 |     30 |   32
+ 14   |            |         203 |    203 |  203
+ 18   |            |          73 |     73 |   73
+ 26   |            |          29 |     29 |   29
+ 34   |            |          77 |     77 |   77
+ 42   |            |          22 |     22 |   22
+ 46   |            |           5 |      5 |    5
+ 50   |            |          15 |     15 |   15
+ 62   |            |          11 |     11 |   11
+ 66   |            |         163 |    163 |  163
+ 70   |            |           8 |      8 |    8
+ 74   |            |          15 |     15 |   15
+ 82   |            |         406 |    406 |  404
+ 86   |            |           1 |      1 |    1
+ 90   |            |          70 |     70 |   70
+ 94   |            |           4 |      4 |    4
+(17 rows)
+
+
+Sat Jan 22 05:03:29 -03 2022
+psql -h 172.26.68.222 PRODSEG
+
+ prov | provincia  | localidades | covers | c1s
+------+------------+-------------+--------+------
+      | total país |        1240 |   1238 | 1237
+ 10   |            |          55 |     53 |   55
+ 14   |            |         209 |    209 |  209
+ 18   |            |          85 |     85 |   85
+ 22   |            |          11 |     11 |   11
+ 26   |            |          29 |     29 |   29
+ 34   |            |          77 |     77 |   77
+ 42   |            |          28 |     28 |   28
+ 46   |            |           5 |      5 |    5
+ 50   |            |          15 |     15 |   15
+ 62   |            |          12 |     12 |   12
+ 66   |            |         163 |    163 |  163
+ 70   |            |          12 |     12 |   12
+ 74   |            |          48 |     48 |   47
+ 82   |            |         406 |    406 |  404
+ 86   |            |           1 |      1 |    1
+ 90   |            |          80 |     80 |   80
+ 94   |            |           4 |      4 |    4
+(18 rows)
+
+Mon Jan 24 06:26:08 -03 2022
+ prov |            provincia            | localidades | covers | c1s
+------+---------------------------------+-------------+--------+------
+      | total país                      |        1280 |   1279 | 1278
+ 02   | Ciudad Autónoma de Buenos Aires |             |        |
+ 06   | Buenos Aires                    |             |        |
+ 10   | Catamarca                       |          58 |     57 |   58
+ 14   | Córdoba                         |         209 |    209 |  209
+ 18   | Corrientes                      |          88 |     88 |   88
+ 22   | Chaco                           |          11 |     11 |   11
+ 26   | Chubut                          |          29 |     29 |   29
+ 30   | Entre Ríos                      |             |        |
+ 34   | Formosa                         |          77 |     77 |   77
+ 38   | Jujuy                           |             |        |
+ 42   | La Pampa                        |          28 |     28 |   28
+ 46   | La Rioja                        |           5 |      5 |    5
+ 50   | Mendoza                         |          15 |     15 |   15
+ 54   | Misiones                        |             |        |
+ 58   | Neuquén                         |             |        |
+ 62   | Río Negro                       |          19 |     19 |   19
+ 66   | Salta                           |         163 |    163 |  163
+ 70   | San Juan                        |          39 |     39 |   39
+ 74   | San Luis                        |          48 |     48 |   48
+ 78   | Santa Cruz                      |             |        |
+ 82   | Santa Fe                        |         406 |    406 |  404
+ 86   | Santiago del Estero             |           1 |      1 |    1
+ 90   | Tucumán                         |          80 |     80 |   80
+ 94   | Tierra del Fuego                |           4 |      4 |    4
+(25 rows)
+
+Tue Jan 25 07:12:20 -03 2022
+ prov |            provincia            | localidades | covers | c1s
+------+---------------------------------+-------------+--------+------
+      | total país                      |        1311 |   1310 | 1309
+ 02   | Ciudad Autónoma de Buenos Aires |             |        |
+ 06   | Buenos Aires                    |             |        |
+ 10   | Catamarca                       |          58 |     57 |   58
+ 14   | Córdoba                         |         218 |    218 |  218
+ 18   | Corrientes                      |          91 |     91 |   91
+ 22   | Chaco                           |          11 |     11 |   11
+ 26   | Chubut                          |          29 |     29 |   29
+ 30   | Entre Ríos                      |             |        |
+ 34   | Formosa                         |          77 |     77 |   77
+ 38   | Jujuy                           |             |        |
+ 42   | La Pampa                        |          28 |     28 |   28
+ 46   | La Rioja                        |           5 |      5 |    5
+ 50   | Mendoza                         |          15 |     15 |   15
+ 54   | Misiones                        |             |        |
+ 58   | Neuquén                         |             |        |
+ 62   | Río Negro                       |          26 |     26 |   26
+ 66   | Salta                           |         163 |    163 |  163
+ 70   | San Juan                        |          39 |     39 |   39
+ 74   | San Luis                        |          48 |     48 |   48
+ 78   | Santa Cruz                      |             |        |
+ 82   | Santa Fe                        |         406 |    406 |  404
+ 86   | Santiago del Estero             |           1 |      1 |    1
+ 90   | Tucumán                         |          92 |     92 |   92
+ 94   | Tierra del Fuego                |           4 |      4 |    4
 (25 rows)
 
 */
