@@ -19,9 +19,10 @@ cruzados as (
     join listado_sin_nulos k
     using (prov, dpto, codloc, frac, radio, mza, lado)
     where i.orden_reco <= j.orden_reco and j.orden_reco <= k.orden_reco 
+      and i.nrocatastr != j.nrocatastr and j.nrocatastr != k.nrocatastr and i.nrocatastr != k.nrocatastr
       and not (j.nrocatastr between i.nrocatastr and k.nrocatastr or j.nrocatastr between k.nrocatastr and i.nrocatastr)
       and not (i.nrocatastr = '0' or j.nrocatastr = '0' or k.nrocatastr = '0'))
-select distinct frac, radio, mza, lado, nrocatastr_i
+select distinct frac, radio, mza, lado, nrocatastr_i, nrocatastr_j, nrocatastr_k 
 from cruzados
 ;
 /*
