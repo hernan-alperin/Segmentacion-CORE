@@ -17,7 +17,7 @@ begin
 
 return query
 execute '
-select segmento_id
+select segmento_id::bigint
 from "' || esquema || '".listado
 join "' || esquema || '".segmentacion
 on listado_id = listado.id
@@ -30,7 +30,7 @@ $function$
 
 create or replace function
 indec.segmentos_excedidos_ffrr(esquema text, ff integer, rr integer, umbral integer)
-    returns table (segmento_id bigint)
+    returns table (segmento_id bigint, cantidad bigint)
     language plpgsql volatile
     set client_min_messages = error
 as $function$
@@ -39,7 +39,7 @@ begin
 
 return query
 execute '
-select segmento_id
+select segmento_id::bigint, count(indec.contar_vivienda(tipoviv)) cantidad
 from "' || esquema || '".listado
 join "' || esquema || '".segmentacion
 on listado_id = listado.id
@@ -63,14 +63,14 @@ declare
   excedidos record;
 begin
 for excedidos in
-  select segmento_id from indec.segmentos_excedidos_ffrr(esquema, ff, rr, umbral)
+  select segmento_id, cantidad from indec.segmentos_excedidos_ffrr(esquema, ff, rr, umbral)
 loop
   execute 'select indec.segmentar_listado_equilibrado(''' || esquema || ''', 
   ''select * from "' || esquema || '".listado
   join "' || esquema || '".segmentacion
   on listado_id = listado.id
   where segmento_id = ' || excedidos.segmento_id::text || ''', 
-  '' mza::integer, lado::integer, orden_reco::integer ''::text, ' || deseado || ')';
+  '' mza::integer, lado::integer, orden_reco::integer ''::text, least(' || deseado || ', ' || excedidos.cantidad || '/2))';
 end loop;
 
 return 1;
