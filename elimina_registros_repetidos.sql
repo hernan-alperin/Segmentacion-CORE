@@ -25,6 +25,7 @@ loop
   execute 'delete from ' || localidades.table_schema || '.listado
     where id not in (select min(id) from ' || localidades.table_schema || '.listado
                      group by prov, dpto, codloc, frac, radio, mza, lado, orden_reco);';
+  execute 'select indec.sincro_r3(' || localidades.table_schema || ');'
 end loop;
 
 return 1;
