@@ -6,6 +6,7 @@ autor: -h
 fecha:2020-11
 */
 
+drop function indec.segmentos_excedidos(esquema text, umbral integer);
 create or replace function
 indec.segmentos_excedidos(esquema text, umbral integer)
     returns table (segmento_id bigint)
@@ -28,6 +29,7 @@ end;
 $function$
 ;
 
+drop function indec.segmentos_excedidos_ffrr(esquema text, ff integer, rr integer, umbral integer);
 create or replace function
 indec.segmentos_excedidos_ffrr(esquema text, ff integer, rr integer, umbral integer)
     returns table (segmento_id bigint, cantidad bigint)
