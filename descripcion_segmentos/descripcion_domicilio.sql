@@ -54,7 +54,7 @@ IF (hay_subtipo) THEN
     else ''vivienda colectiva''
   end
   from "' || esquema || '".listado
-  join public.subtipo_vivienda st
+  left join public.subtipo_vivienda st
   on cod_subt_v = st.codigo
   where ' || listado_id || ' = listado.id
   ' into subtipo;
