@@ -99,7 +99,7 @@ radios_mixtos as (
     on radio_id = radio.id
     join localidad
     on localidad_id = localidad.id
-    where tipo_de_radio.nombre = ''M'' and cod_loc not like ''%000''
+    where tipo_de_radio.nombre = ''M'' and localidad.codigo not like ''%000''
     ),
 multiples as (
     select cod_radio, count(*)
