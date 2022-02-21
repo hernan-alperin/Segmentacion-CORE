@@ -88,7 +88,7 @@ segmentos_id as (
 update "' || esquema || '".segmentacion sgm
 set segmento_id = j.segmento_id
 from (segmentos_id
-join asignacion_segmentos
+join asignacion_segmentos_pisos_enteros
 using (prov, dpto, codloc, frac, radio, sgm_listado)) j
 where listado_id = j.id
 
