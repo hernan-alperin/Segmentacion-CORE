@@ -88,7 +88,7 @@ segmentos_id as (
         nextval(''"' || esquema || '".segmentos_seq'')
         as segmento_id,
         prov, dpto, codloc, frac, radio, sgm_listado
-    from asignacion_segmentos_en_listado
+    from segmento_id_en_listado
     group by prov, dpto, codloc, frac, radio, sgm_listado
     order by prov, dpto, codloc, frac, radio, sgm_listado
     )
