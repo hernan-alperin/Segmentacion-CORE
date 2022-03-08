@@ -49,12 +49,12 @@ END IF;
 
 IF (hay_subtipo) THEN
   execute '
-  select case when cod_subt_v != ''CO10''
+  select case when (cod_subt_v is not Null or cod_subt_v != ''CO10'') and st.codigo is not Null
     then nombre
     else ''vivienda colectiva''
   end
   from "' || esquema || '".listado
-  join public.subtipo_vivienda st
+  left join public.subtipo_vivienda st
   on cod_subt_v = st.codigo
   where ' || listado_id || ' = listado.id
   ' into subtipo;
