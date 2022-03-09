@@ -99,7 +99,7 @@ radios_mixtos as (
     on radio_id = radio.id
     join localidad
     on localidad_id = localidad.id
-    where tipo_de_radio.nombre = ''M''
+    where tipo_de_radio.nombre = ''M'' and localidad.codigo not like ''%000''
     ),
 multiples as (
     select cod_radio, count(*)
@@ -112,7 +112,6 @@ radio_localidad_rank as (
     from radios_mixtos
     join multiples
     using (cod_radio)
-    where cod_loc not like ''%000''
     )
 select count, rank
 from radio_localidad_rank
