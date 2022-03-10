@@ -78,12 +78,20 @@ asignacion_segmentos_pisos_enteros as (
         nrocatastr, sector, edificio, entrada, piso
     ),
 
+segmento_id_en_listado as (
+  select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, piso, orden_reco::integer,
+    sgm_listado
+  from listado_sin_nulos
+  join asignacion_segmentos_pisos_enteros
+  using (prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, piso)
+  ),
+  
 segmentos_id as (
     select
         nextval(''"' || esquema || '".segmentos_seq'')
         as segmento_id,
         prov, dpto, codloc, frac, radio, sgm_listado
-    from asignacion_segmentos_pisos_enteros
+    from segmento_id_en_listado
     group by prov, dpto, codloc, frac, radio, sgm_listado
     order by prov, dpto, codloc, frac, radio, sgm_listado
     )
@@ -91,7 +99,7 @@ segmentos_id as (
 update "' || esquema || '".segmentacion sgm
 set segmento_id = j.segmento_id
 from (segmentos_id
-join asignacion_segmentos
+join segmento_id_en_listado
 using (prov, dpto, codloc, frac, radio, sgm_listado)) j
 where listado_id = j.id
 
