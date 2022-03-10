@@ -1,4 +1,3 @@
-
 /*
 titulo: segmentos_excedidos.sql
 descripción: función que devuelve una lista de los segmentos excedidos en el radio
@@ -58,7 +57,7 @@ create or replace function
 indec.segmentar_excedidos_ffrr(esquema text, ff integer, rr integer, umbral integer, deseado integer)
     returns integer
     language plpgsql volatile
-    //set client_min_messages = error
+    set client_min_messages = notice
 as $function$
 declare
   excedidos record;
