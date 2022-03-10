@@ -103,7 +103,7 @@ from (segmentos_id
 join segmento_id_en_mza
 using (prov, dpto, codloc, frac, radio, mza, sgm_mza)) j
 where listado_id = j.id
-into resultados';
+';
 
 get diagnostics n = row_count;
 
