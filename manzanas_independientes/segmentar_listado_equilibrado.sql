@@ -33,15 +33,17 @@ listado_sin_nulos as (
     select id, prov, dpto, codloc, frac, radio, mza, lado, 
     CASE WHEN trim(nrocatastr) in ('''',null,''S/N'',''S N'') THEN orden_reco else nrocatastr END  nrocatastr ,
     coalesce(sector,'''') sector, coalesce(edificio,'''') edificio, coalesce(entrada,'''') entrada,
-    coalesce(piso,'''') piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco
+     coalesce(piso,'''') piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco,
+      tipoviv
+
     from listado
     ),
 
 casos as (
     select prov, dpto, codloc, frac, radio, 
-           count(*) as vivs,
-           ceil(count(*)/deseado) as redondeado_arriba,
-           greatest(1, floor(count(*)/deseado)) as redondeado_abajo
+           count(indec.contar_vivienda(tipoviv)) as vivs,
+           ceil(count(indec.contar_vivienda(tipoviv))/deseado) as redondeado_arriba,
+           greatest(1, floor(count(indec.contar_vivienda(tipoviv))/deseado)) as redondeado_abajo
     from listado_sin_nulos, parametros
     group by prov, dpto, codloc, frac, radio, deseado
     ),
@@ -81,7 +83,7 @@ asignacion_segmentos_pisos_enteros as (
     ),
 
 segmento_id_en_listado as (
-  select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, piso, orden_reco::integer,
+  select id, 
     sgm_listado
   from listado_sin_nulos
 full  join asignacion_segmentos_pisos_enteros
@@ -92,17 +94,17 @@ segmentos_id as (
     select
         nextval(''"' || esquema || '".segmentos_seq'')
         as segmento_id,
-        prov, dpto, codloc, frac, radio, sgm_listado
+        sgm_listado
     from segmento_id_en_listado
-    group by prov, dpto, codloc, frac, radio, sgm_listado
-    order by prov, dpto, codloc, frac, radio, sgm_listado
+    group by sgm_listado
+    order by sgm_listado
     )
 
 update "' || esquema || '".segmentacion sgm
 set segmento_id = j.segmento_id
 from (segmentos_id
 join segmento_id_en_listado
-using (prov, dpto, codloc, frac, radio, sgm_listado)) j
+using (sgm_listado)) j
 where listado_id = j.id
 
 ';
