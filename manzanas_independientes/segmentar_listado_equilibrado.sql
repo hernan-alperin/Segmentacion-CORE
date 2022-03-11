@@ -17,18 +17,23 @@ create or replace function
 indec.segmentar_listado_equilibrado(esquema text, query text, orden_recorrido text, deseado integer)
     returns integer
     language plpgsql volatile
-    set client_min_messages = error
+    set client_min_messages = notice
 as $function$
+declare
+n int;
+consulta text;
 begin
-execute '
+RAISE NOTICE 'Segmentando listado equilibrado %',esquema;
+consulta := '
 with
 parametros as (
     select ' || deseado || '::float as deseado),
 listado as (' || query || '),
 listado_sin_nulos as (
-    select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr,
+    select id, prov, dpto, codloc, frac, radio, mza, lado, 
+    CASE WHEN trim(nrocatastr) in ('''',null,''S/N'',''S N'') THEN orden_reco else nrocatastr END  nrocatastr ,
     coalesce(sector,'''') sector, coalesce(edificio,'''') edificio, coalesce(entrada,'''') entrada,
-     piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco
+    coalesce(piso,'''') piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco
     from listado
     ),
 
@@ -79,7 +84,7 @@ segmento_id_en_listado as (
   select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, piso, orden_reco::integer,
     sgm_listado
   from listado_sin_nulos
-  join asignacion_segmentos_pisos_enteros
+full  join asignacion_segmentos_pisos_enteros
   using (prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, piso)
   ),
   
@@ -101,7 +106,10 @@ using (prov, dpto, codloc, frac, radio, sgm_listado)) j
 where listado_id = j.id
 
 ';
-return 1;
+execute consulta;
+RAISE NOTICE 'Consulta %',consulta;
+get diagnostics n = row_count;
+return n;
 
 end;
 $function$
