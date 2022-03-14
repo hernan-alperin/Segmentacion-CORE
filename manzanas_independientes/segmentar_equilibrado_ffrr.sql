@@ -17,7 +17,7 @@ create or replace function
 indec.segmentar_equilibrado_ffrr(esquema text, _frac integer, _radio integer, deseado integer)
     returns integer
     language plpgsql volatile
-    set client_min_messages = notice
+    set client_min_messages = 'notice'
 as $function$
 declare
 n int;
