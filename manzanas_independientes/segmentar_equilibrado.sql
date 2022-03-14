@@ -27,8 +27,8 @@ parametros as (
     select ' || deseado || '::float as deseado),
 listado as (select * from "' || aglomerado || '".listado),
 listado_sin_nulos as (
-   select id, prov, dpto, codloc, frac, radio, mza, lado, nrocatastr,
-    CASE WHEN trim(nrocatastr) in ('''',null,''S/N'',''S N'') THEN orden_reco else nrocatastr END  nrocatastr ,
+   select id, prov, dpto, codloc, frac, radio, mza, lado, 
+    CASE WHEN trim(nrocatastr) in ('''',null,''S/N'',''S N'') THEN orden_reco else nrocatastr END  nrocatastr,
     coalesce(sector,'''') sector, coalesce(edificio,'''') edificio, coalesce(entrada,'''') entrada,
     coalesce(piso, '''') piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco
     from listado
