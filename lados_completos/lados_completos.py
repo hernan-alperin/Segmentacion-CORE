@@ -156,8 +156,8 @@ def costo(segmento):
         ponderacion = 10
       else:
         ponderacion = 9
-      else:
-        ponderacion = 1
+    else:
+      ponderacion = 1
     return costo_vivs * ponderacion + costo_mzas + costo_adyacencias
   else: # la función de costo original
     multa_fuera_rango_superior = 1e3
