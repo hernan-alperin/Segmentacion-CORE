@@ -45,18 +45,18 @@ listado_sin_nulos as (
     ),
 
 casos as (
-    select prov, dpto, codloc, frac, radio,
-           count(indec.contar_vivienda(tipoviv)) as vivs,
-           ceil(count(indec.contar_vivienda(tipoviv))/deseado) as redondeado_arriba,
-           greatest(1, floor(count(indec.contar_vivienda(tipoviv))/deseado)) as redondeado_abajo
+    select prov, dpto, codloc, frac, radio, 
+           count(*) as registros,
+           ceil(count(*)/deseado) as redondeado_arriba,
+           greatest(1, floor(count(*)/deseado)) as redondeado_abajo
     from listado_sin_nulos, parametros
     group by prov, dpto, codloc, frac, radio, deseado
     ),
 
 deseado_redondeado as (
-    select prov, dpto, codloc, frac, radio, vivs,
-        case when abs(vivs/redondeado_arriba - deseado)
-            < abs(vivs/redondeado_abajo - deseado) then redondeado_arriba
+    select prov, dpto, codloc, frac, radio, registros,
+        case when abs(registros/redondeado_arriba - deseado)
+            < abs(registros/redondeado_abajo - deseado) then redondeado_arriba
         else redondeado_abajo end as segs_x_listado
     from casos, parametros
     ),
@@ -91,7 +91,7 @@ segmento_id_en_listado as (
   select id,
     sgm_listado
   from listado_sin_nulos
-full  join asignacion_segmentos_pisos_enteros
+  full join asignacion_segmentos_pisos_enteros
   using (prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, piso)
   ),
  
