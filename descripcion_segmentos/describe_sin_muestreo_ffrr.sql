@@ -34,12 +34,10 @@ with
   segmentacion as ( select * from "' || esquema || '".segmentacion),
   segmentos_row_number as (
   select prov, dpto, codloc, frac, radio, segmento_id, mza::integer as mza, lado::integer lado, 
-    orden_reco::integer orden_reco, sector, edificio, entrada,
-    REGEXP_REPLACE(COALESCE(piso::character varying, ''0''), ''[^0-9]*'' ,''0'')::integer as piso,
+    orden_reco::integer orden_reco, sector, edificio, entrada, piso,
     row_number () over (
       partition by prov, dpto, codloc, frac, radio, segmento_id
-      order by mza::integer, lado::integer, orden_reco::integer, sector, edificio, entrada,
-      REGEXP_REPLACE(COALESCE(piso::character varying, ''0''), ''[^0-9]*'' ,''0'')::integer desc
+      order by mza::integer, lado::integer, orden_reco::integer, sector, edificio, entrada, piso desc
       ) as rnk
   from listado
   join segmentacion
@@ -52,8 +50,7 @@ ranks as (
   where rnk = 1
   window w as (
     partition by prov, dpto, codloc, frac, radio
-    order by mza, lado, orden_reco, sector, edificio, entrada, 
-    REGEXP_REPLACE(COALESCE(piso::character varying, ''0''), ''[^0-9]*'' ,''0'')::integer desc
+    order by mza, lado, orden_reco, sector, edificio, entrada, piso desc
     )
   ),
 
