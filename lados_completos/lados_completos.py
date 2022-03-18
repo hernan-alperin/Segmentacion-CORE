@@ -153,11 +153,11 @@ def costo(segmento):
     costo_mzas = 5*mzas_segmento*mzas_segmento
     if 'pondera_viviendas' in sys.argv:
       if carga_segmento > cantidad_de_viviendas_deseada_por_segmento:
-          ponderacion = 10
-     else:
-          ponderacion = 9
-    else:
-      ponderacion = 1
+        ponderacion = 10
+      else:
+        ponderacion = 9
+      else:
+        ponderacion = 1
     return costo_vivs * ponderacion + costo_mzas + costo_adyacencias
   else: # la función de costo original
     multa_fuera_rango_superior = 1e3
