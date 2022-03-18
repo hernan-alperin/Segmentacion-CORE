@@ -69,7 +69,7 @@ pisos_abiertos as (
 asignacion_segmentos as (
     select id, prov, dpto, codloc, frac, radio, mza, lado,
         nrocatastr, sector, edificio, entrada, piso, orden_reco::integer,
-        floor((rank - 1)*segs_x_listado/vivs) + 1 as sgm_listado, rank
+        floor((rank - 1)*segs_x_listado/registros) + 1 as sgm_listado, rank
     from deseado_redondeado
     join pisos_abiertos
     using (prov, dpto, codloc, frac, radio)
