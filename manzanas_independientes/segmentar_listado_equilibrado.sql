@@ -30,13 +30,8 @@ parametros as (
     select ' || deseado || '::float as deseado),
 listado as (' || query || '),
 listado_sin_nulos as (
-    select id, prov, dpto, codloc, frac, radio, mza, lado,
-    CASE WHEN trim(nrocatastr) in ('''',null,''S/N'',''S N'')
-    and (    coalesce(sector,'''')=''''
-         and coalesce(edificio,'''')=''''
-         and coalesce(entrada,'''')=''''
-         and coalesce(piso,'''')='''')
-      THEN orden_reco else nrocatastr END  nrocatastr ,
+    select id, prov, dpto, codloc, frac, radio, mza, lado, 
+    CASE WHEN trim(nrocatastr) in ('''',null,''S/N'',''S N'') THEN orden_reco else nrocatastr END  nrocatastr ,
     coalesce(sector,'''') sector, coalesce(edificio,'''') edificio, coalesce(entrada,'''') entrada,
      coalesce(piso,'''') piso, coalesce(CASE WHEN orden_reco='''' THEN NULL ELSE orden_reco END,''0'')::integer orden_reco,
       tipoviv
@@ -88,13 +83,13 @@ asignacion_segmentos_pisos_enteros as (
     ),
 
 segmento_id_en_listado as (
-  select id,
+  select id, 
     sgm_listado
   from listado_sin_nulos
   full join asignacion_segmentos_pisos_enteros
   using (prov, dpto, codloc, frac, radio, mza, lado, nrocatastr, sector, edificio, entrada, piso)
   ),
- 
+  
 segmentos_id as (
     select
         nextval(''"' || esquema || '".segmentos_seq'')
