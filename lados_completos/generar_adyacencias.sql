@@ -6,7 +6,7 @@ function de CORE
 CREATE OR REPLACE FUNCTION indec.generar_adyacencias(aglomerado text)
  RETURNS integer
  LANGUAGE plpgsql volatile
-SET client_min_messages = error
+SET client_min_messages = notice
 AS $function$
 declare
 n int;
