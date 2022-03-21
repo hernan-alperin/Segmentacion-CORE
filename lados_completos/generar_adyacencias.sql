@@ -115,7 +115,7 @@ lado_de_enfrente as (
         a.arc_tipo, a.arc_codigo
     from lados_de_manzana i
     join lados_de_manzana j
-    on i.codigos = j.codigos -- mismo eje
+    on i.codigos = j.codigos -- presume mismo eje xq comparten codigo20
     and i.nodo_j_geom = j.nodo_i_geom -- el lado_i termina donde el lado_j empieza
     -- los lados van de nodo_i a nodo_j
     join manzanas_adyacentes a
@@ -125,20 +125,17 @@ lado_de_enfrente as (
     ),
 
 mza_enfrente as (
-    select distinct i.ppdddlllffrrmmm as mza_i, i.lado as lado_i,
-        j.ppdddlllffrrmmm as mza_j, j.lado as lado_j,
-        a.arc_tipo, a.arc_codigo
-    from lados_de_manzana i
-    join lados_de_manzana j
-    on i.codigos = j.codigos -- mismo eje
-------------------------------------- relajamos condición de enfrente. no cruza por la esquina
-    and not (i.nodo_j_geom = j.nodo_i_geom) -- el lado_i no termina donde el lado_j empieza
-    -- los lados van de nodo_i a nodo_j
-----------------------------------------------------------------------------------------------------------
-    join manzanas_adyacentes a
-    on i.ppdddlllffrrmmm = a.mza_i and j.ppdddlllffrrmmm = a.mza_j -- las manzanas son adyacentes
-    and a.arc_codigo = any(j.codigos) -- mismo eje
-    where ST_Dimension(ST_Intersection(i.wkb_geometry,j.wkb_geometry)) = 1
+    select distinct mzai as mza_i, ladoi as lado_i,
+        mzad as mza_j, ladod as lado_j,
+        tipo as arc_tipo, codigo20 as arc_codigo
+    from arcos
+    where length(trim(mzai)) >= 15
+    and length(trim(mzad)) >= 15
+    and (mzai, mzad) not in (
+      select mza_i, mza_j from lado_de_enfrente
+      union
+      select mza_j, mza_i from lado_de_enfrente
+      )
     ),
 
 ---- cruzar -----------------------------------------------------------
@@ -181,7 +178,6 @@ from segmentacion.adyacencias
 where shape = ''' || aglomerado || '''
 ;'
 ;
-
 
 execute '
 insert into segmentacion.adyacencias (shape, prov, dpto, codloc, frac, radio, mza, lado, mza_ady, lado_ady, tipo)
