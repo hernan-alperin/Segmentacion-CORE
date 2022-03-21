@@ -8,12 +8,16 @@ CREATE OR REPLACE FUNCTION indec.generar_adyacencias(aglomerado text)
  LANGUAGE plpgsql volatile
 SET client_min_messages = error
 AS $function$
-
+declare
+n int;
+consulta text;
 begin
 
-execute 'drop table if exists "' || aglomerado || '".lados_adyacentes cascade;';
+consulta := 'drop table if exists "' || aglomerado || '".lados_adyacentes cascade;';
+execute consulta;
+RAISE NOTICE 'Consulta %', consulta;
 
-execute '
+consulta := '
 create table "' || aglomerado || '".lados_adyacentes as 
 
 with 
@@ -169,17 +173,21 @@ union
 select mza_i, lado_i::integer, mza_j, lado_j::integer, arc_tipo, arc_codigo::integer, ''cruza''::text from lado_para_cruzar
 ;'
 ;
+execute consulta;
+RAISE NOTICE 'Consulta %', consulta;
 
 -----------------------------------------------------------------------
 
-execute '
+consulta := '
 delete
 from segmentacion.adyacencias
 where shape = ''' || aglomerado || '''
 ;'
 ;
+execute consulta;
+RAISE NOTICE 'Consulta %', consulta;
 
-execute '
+consulta := '
 insert into segmentacion.adyacencias (shape, prov, dpto, codloc, frac, radio, mza, lado, mza_ady, lado_ady, tipo)
 select ''' || aglomerado || '''::text as shape, substr(mza_i,1,2)::integer as prov,
     substr(mza_i,3,3)::integer as dpto,
@@ -192,8 +200,10 @@ select ''' || aglomerado || '''::text as shape, substr(mza_i,1,2)::integer as pr
 from "' || aglomerado || '".lados_adyacentes;
 ;'
 ;
-
-return 1;
+execute consulta;
+RAISE NOTICE 'Consulta %', consulta;
+get diagnostics n = row_count;
+return n;
 end;
 $function$
 ;
