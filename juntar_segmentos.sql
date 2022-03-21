@@ -12,7 +12,7 @@ create or replace function
 indec.juntar_segmentos(esquema text)
     returns integer
     language plpgsql volatile
-    set client_min_messages = error
+    set client_min_messages = notice
 as $function$
 declare
 n int;
@@ -70,7 +70,7 @@ create or replace function
 indec.juntar_segmentos_ffrr(esquema text, frac integer, radio integer)
     returns integer
     language plpgsql volatile
-    set client_min_messages = error
+    set client_min_messages = notice
 as $function$
 declare
 n int;
@@ -130,7 +130,7 @@ create or replace function
 indec.juntar_segmentos_con_menos_de_ffrr(esquema text, frac integer, radio integer, menos_de integer)
     returns integer
     language plpgsql volatile
-    set client_min_messages = error
+    set client_min_messages = notice
 as $function$
 declare
 n int;
