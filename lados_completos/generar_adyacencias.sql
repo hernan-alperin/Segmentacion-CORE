@@ -136,6 +136,7 @@ mza_enfrente as (
     where length(trim(mzai)) >= 15
     and length(trim(mzad)) >= 15
     and mzai != mzad
+    and substr(mzai,1,12) = substr(mzad,1,12) -- mismo radio
     and (mzai, mzad) not in (
       select mza_i, mza_j from lado_de_enfrente
       union
