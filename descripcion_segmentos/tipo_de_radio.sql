@@ -53,6 +53,7 @@ declare
 loc_count integer;
 loc_rank integer;
 etiqueta char(2);
+overflow boolean := false;
 
 begin
 
@@ -80,7 +81,7 @@ separadas geográficamente dentro de un mismo radio)
 80-89 la 1ra localidad, 70-79 la 2da, 91-95 la 3ra, 96-99 la 4ta
 si es una sola localidad, 80-89 los 1eros 10 segmentos, 70-79 los segundos 10
 desde el 11avo al 20avo, 91-99 los últimos 9
-
+para la 5ta localidad usa los 60's y también si la 1ra o 2da tiene más de 10
 */
 
 execute '
@@ -132,19 +133,40 @@ else
     elsif (_rank between 21 and 29) then
       etiqueta = (_rank + 91 - 21)::text;
     else
-      etiqueta = 'YY';
+      etiqueta = '-1';
     end if;
   elsif (loc_count > 1) then
     if (loc_rank = 1) then
-      etiqueta = (_rank + 80 - 1)::text;
+      if (_rank <= 10) then
+        etiqueta = (_rank + 80 - 1)::text;
+      else
+        if (loc_count < 3) then 
+          etiqueta = (_rank + 80)::text;
+        else 
+          etiqueta = (_rank + 60 - 11)::text;
+          overflow = true;
+        end if;
+      end if;
     elsif (loc_rank = 2) then
-      etiqueta = (_rank + 70 - 1)::text;
+      if (_rank <= 10) then
+        etiqueta = (_rank + 70 - 1)::text;
+      elsif (not overflow) then 
+        etiqueta = (_rank + 60 - 10)::text;
+      else 
+        etiqueta = '-3';
+      end if;
     elsif (loc_rank = 3) then
       etiqueta = (_rank + 90)::text;
     elsif (loc_rank = 4) then
       etiqueta = (_rank + 95)::text;
+    elsif (loc_rank = 5) then
+      if (not overflow) then 
+        etiqueta = (_rank + 60 - 10)::text;
+      else 
+        etiqueta = '-3';
+      end if;
     else 
-      etiqueta = 'XX';
+      etiqueta = '-2';
     end if;
   end if;
 end if;
