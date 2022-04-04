@@ -161,7 +161,13 @@ else
       etiqueta = (_rank + 95)::text;
     elsif (loc_rank = 5) then
       if (not overflow) then 
-        etiqueta = (_rank + 60 - 10)::text;
+        etiqueta = (_rank + 60 - 1)::text;
+      else 
+        etiqueta = '-3';
+      end if;
+    elsif (loc_rank = 6) then
+      if (not overflow) then 
+        etiqueta = (_rank + 65 - 1)::text;
       else 
         etiqueta = '-3';
       end if;
