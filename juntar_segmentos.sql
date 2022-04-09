@@ -152,8 +152,8 @@ with lados_del_segmento as (
     join lados_del_segmento i
     on a.mza_i = i.ppdddcccffrrmmm and a.lado_i = i.lado
     join lados_del_segmento j
-    on a.mza_j = j.ppdddcccffrrmmm and a.lado_j = j.lado 
-       or i.lado=j.lado
+    on (a.mza_j = j.ppdddcccffrrmmm and a.lado_j = j.lado) or
+       (i.ppdddcccffrrmmm = j.ppdddcccffrrmmm and i.lado=j.lado)
     where i.segmento_id != j.segmento_id
   ),
   segmentos_viviendas as (
