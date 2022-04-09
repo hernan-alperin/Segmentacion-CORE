@@ -101,6 +101,7 @@ radios_mixtos as (
     join localidad
     on localidad_id = localidad.id
     where tipo_de_radio.nombre = ''M'' and localidad.codigo not like ''%000'' 
+      and length(trim(radio.codigo))=9
     ),
 multiples as (
     select cod_radio, count(*)

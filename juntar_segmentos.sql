@@ -152,7 +152,8 @@ with lados_del_segmento as (
     join lados_del_segmento i
     on a.mza_i = i.ppdddcccffrrmmm and a.lado_i = i.lado
     join lados_del_segmento j
-    on a.mza_j = j.ppdddcccffrrmmm and a.lado_j = j.lado
+    on (a.mza_j = j.ppdddcccffrrmmm and a.lado_j = j.lado) or
+       (i.ppdddcccffrrmmm = j.ppdddcccffrrmmm and i.lado=j.lado)
     where i.segmento_id != j.segmento_id
   ),
   segmentos_viviendas as (
@@ -168,7 +169,7 @@ with lados_del_segmento as (
     from segmentos_contiguos
     join segmentos_viviendas i on seg_i = i.segmento_id
     join segmentos_viviendas j on seg_j = j.segmento_id
-    where i.vivs < ' || menos_de || ' and j.vivs > 0
+    where i.vivs < ' || menos_de || ' and j.segmento_id!=i.segmento_id
   )
 
 update "' || esquema || '".segmentacion
